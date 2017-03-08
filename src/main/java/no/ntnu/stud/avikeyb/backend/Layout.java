@@ -1,5 +1,7 @@
 package no.ntnu.stud.avikeyb.backend;
 
+import no.ntnu.stud.avikeyb.backend.layouts.util.LayoutState;
+
 /**
  * Interface representing a keyboard layout
  */
@@ -30,5 +32,11 @@ public interface Layout extends InputInterface {
      * @param listener the listener to remove to the layout
      */
     void removeLayoutListener(LayoutListener listener);
-    
+
+    /**
+     * Returns the current state of the layout
+     *
+     * @return a state object
+     */
+    LayoutState getCurrentLayoutInternalState();
 }

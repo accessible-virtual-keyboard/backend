@@ -8,6 +8,7 @@ import no.ntnu.stud.avikeyb.backend.Keyboard;
 import no.ntnu.stud.avikeyb.backend.Suggestions;
 import no.ntnu.stud.avikeyb.backend.Symbol;
 import no.ntnu.stud.avikeyb.backend.Symbols;
+import no.ntnu.stud.avikeyb.backend.layouts.util.LayoutState;
 
 /**
  * Basic binary search layout
@@ -113,6 +114,15 @@ public class BinarySearchLayout extends StepLayout {
      */
     public List<String> getSuggestions() {
         return suggestions;
+    }
+
+
+    public LayoutState getCurrentLayoutInternalState() {
+        LayoutState state = new LayoutState();
+        state.add("left", currentNode.getLeft().getItems());
+        state.add("right", currentNode.getRight().getItems());
+        state.add("suggestions", suggestions);
+        return state;
     }
 
 

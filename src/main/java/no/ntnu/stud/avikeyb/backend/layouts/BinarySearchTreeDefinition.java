@@ -271,6 +271,15 @@ public class BinarySearchTreeDefinition {
         }
 
         /**
+         * Returns the items in the current node
+         *
+         * @return a list of objects
+         */
+        public List<Object> getItems(){
+            return items;
+        }
+
+        /**
          * Returns the left sub tree
          *
          * @return a tree node

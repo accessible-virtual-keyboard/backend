@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import no.ntnu.stud.avikeyb.backend.Layout;
+import no.ntnu.stud.avikeyb.backend.layouts.util.LayoutState;
 
 /**
  * Base implementation that implement the layout listeners
@@ -24,6 +25,11 @@ public abstract class BaseLayout implements Layout {
     @Override
     public void removeLayoutListener(LayoutListener listener) {
         listeners.remove(listener);
+    }
+
+    @Override
+    public LayoutState getCurrentLayoutInternalState() {
+        return new LayoutState(); // default empty state
     }
 
     /**

@@ -5,6 +5,7 @@ import no.ntnu.stud.avikeyb.backend.InputType;
 import no.ntnu.stud.avikeyb.backend.Keyboard;
 import no.ntnu.stud.avikeyb.backend.Symbol;
 import no.ntnu.stud.avikeyb.backend.Symbols;
+import no.ntnu.stud.avikeyb.backend.layouts.util.LayoutState;
 
 /**
  * Simple layout for testing
@@ -46,6 +47,13 @@ public class SimpleExampleLayout extends StepLayout {
         return currentPosition;
     }
 
+
+    @Override
+    public LayoutState getCurrentLayoutInternalState() {
+        LayoutState state = new LayoutState();
+        state.add("position", getCurrentPosition());
+        return state;
+    }
 
     @Override
     protected void onStep(InputType input) {
