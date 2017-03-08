@@ -128,8 +128,6 @@ public class BinarySearchLayout extends StepLayout {
 
         // Check if we have reached a final selection
         checkCompleted();
-
-        notifyLayoutListeners();
     }
 
     private void checkCompleted() {
@@ -138,6 +136,10 @@ public class BinarySearchLayout extends StepLayout {
         if (currentNode.isSingle()) {
             selectCurrent();
             reset();
+        }else{
+            // We only need to notify the listeners when not selecting a symbol. When selecting a symbol
+            // the listeners will be notified when the suggestions are updated.
+            notifyLayoutListeners();
         }
     }
 
