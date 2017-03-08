@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -23,7 +25,7 @@ public class ResourceHandlerTest {
      */
     @Before
     public void setUp() {
-        dictionaryHandler = new DictionaryHandler(new DictionaryFileLoader("./src/main/res/raw/test_dictionary.txt").loadDictionary());
+        dictionaryHandler = new DictionaryHandler(new DictionaryFileLoader(getClass().getClassLoader().getResource("test_dictionary.txt").getPath()).loadDictionary());
     }
 
     /**
@@ -31,12 +33,26 @@ public class ResourceHandlerTest {
      */
     @Test
     public void testStoreDictionaryEntries() {
+
+
         boolean isStored = false;
+        Path tmpFile = null;
         try {
-            ResourceHandler.storeDictionaryToFile(dictionaryHandler.getDictionary(), "./src/main/res/raw/test_dictionary.txt");
+            tmpFile = Files.createTempFile("dict_test", "dict");
+            ResourceHandler.storeDictionaryToFile(dictionaryHandler.getDictionary(), tmpFile.toString());
             isStored = true;
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        finally {
+            if(tmpFile != null) {
+                try {
+                    Files.deleteIfExists(tmpFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println("Failed to delete tmp dictionary file");
+                }
+            }
         }
         assertEquals(true, isStored);
     }

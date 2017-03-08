@@ -28,10 +28,11 @@ public class DictionaryHandlerTest {
      */
     @Before
     public void setUp() {
+
 //        System.out.println(getClass().getClassLoader().getResourceAsStream("raw/word.list"));
-        dictionaryHandlerNoFrequency = new DictionaryHandler(new DictionaryFileLoader("./src/main/res/raw/word.list").loadDictionary());
-        dictionaryHandlerWithOneFrequency = new DictionaryHandler(new DictionaryFileLoader("./src/main/res/raw/dictionary.txt").loadDictionary());
-        dictionaryHandlerWithTwoFrequency = new DictionaryHandler(new DictionaryFileLoader("./src/main/res/raw/test_dictionary.txt").loadDictionary());
+        dictionaryHandlerNoFrequency = new DictionaryHandler(new DictionaryFileLoader(getClass().getClassLoader().getResource("word.list").getPath()).loadDictionary());
+        dictionaryHandlerWithOneFrequency = new DictionaryHandler(new DictionaryFileLoader(getClass().getClassLoader().getResource("dictionary.txt").getPath()).loadDictionary());
+        dictionaryHandlerWithTwoFrequency = new DictionaryHandler(new DictionaryFileLoader(getClass().getClassLoader().getResource("test_dictionary.txt").getPath()).loadDictionary());
     }
 
     /**
@@ -40,10 +41,11 @@ public class DictionaryHandlerTest {
     @Test
     public void testInvalidInput() {
         expectedOutputs = Arrays.asList();
-        assertEquals(expectedOutputs, dictionaryHandlerNoFrequency.getSuggestionsStartingWith(""));
         assertEquals(expectedOutputs, dictionaryHandlerNoFrequency.getSuggestionsStartingWith("1239461598247264023421552"));
         assertEquals(expectedOutputs, dictionaryHandlerNoFrequency.getSuggestionsStartingWith("./!@#$%^&*("));
         assertEquals(expectedOutputs, dictionaryHandlerNoFrequency.getSuggestionsStartingWith(null));
+
+        assertNotEquals(expectedOutputs, dictionaryHandlerNoFrequency.getSuggestionsStartingWith("")); // Return most used words
     }
 
     /**
