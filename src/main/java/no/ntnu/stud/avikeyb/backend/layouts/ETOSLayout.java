@@ -161,7 +161,7 @@ public class ETOSLayout extends StepLayout {
                         break;
                     case INPUT2: // selects
 
-                        if (getCurrentSymbol().equals(Symbol.DICTIONARY) && getCurrentSymbol() != null) { //todo do not work
+                        if (getCurrentSymbol().equals(Symbol.DICTIONARY) && getCurrentSymbol() != null) {
                             state = State.SELECT_DICTIONARY;
                         } else if (getCurrentSymbol().equals(Symbol.MENU)) {
                             state = State.SELECT_MENU;
@@ -220,9 +220,17 @@ public class ETOSLayout extends StepLayout {
      * Moving cursor to the next column.
      */
     public void nextColumn() {
+        // currentPosition = (currentPosition + 1) % getCurrentRowLength();
         currentPosition = (currentPosition + 1);
         if (currentPosition % 6 == 0) {
             currentPosition -= 6;
+        } else if ((getCurrentSymbol().equals(Symbol.DICTIONARY)) || (getCurrentSymbol().equals(Symbol.MENU))) {
+
+            if (currentPosition % 3 == 0) {
+                currentPosition -= 3;
+            }
+            //   currentPosition = (currentPosition + 1) % 2;
+
         }
     }
 
