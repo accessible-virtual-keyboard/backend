@@ -262,13 +262,13 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
             String innerResult = "";
             for (int i = 0; i < search.size(); i++) {
                 String subRes = search.get(i);
-                if(i != search.size()-1){
-                    innerResult += subRes + ", ";
-                }else {
+                /*if(i != search.size()-1){
+                    innerResult += subRes + " ";
+                }else {*/
                     innerResult += subRes;
-                }
+                //}
             }
-            result.add(innerResult);
+            result.add(innerResult.toUpperCase());
         }
         result.remove(0);
         return result;
