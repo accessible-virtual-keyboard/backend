@@ -64,6 +64,15 @@ public class AdaptiveLayout extends StepLayout {
     }
 
     /**
+     * Returns the current internal state of the layout
+     *
+     * @return the state of the layout
+     */
+    public State getCurrentState() {
+        return currentState;
+    }
+
+    /**
      * Returns the symbols in the layout.
      * <p>
      * The order of the symbols will change after each typed letter. The order of the symbols
@@ -102,6 +111,20 @@ public class AdaptiveLayout extends StepLayout {
      */
     public int getRowSize() {
         return ROW_LENGTH;
+    }
+
+    public String getSuggestion() {
+        if (currentSuggestion < suggestions.size()) {
+            return suggestions.get(currentSuggestion);
+        }
+        return "";
+    }
+
+    public int getCurrentSuggestion() {
+        if (currentSuggestion < suggestions.size()) {
+            return currentSuggestion;
+        }
+        return 0;
     }
 
 
