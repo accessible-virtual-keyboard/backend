@@ -53,23 +53,14 @@ public class AdaptiveLayout extends StepLayout {
             @Override
             public void onSuggestions(List<String> suggestions1) {
                 AdaptiveLayout.this.suggestions = new ArrayList<>(suggestions1.subList(0, Math.min(6, suggestions1.size())));
-                AdaptiveLayout.this.currentSuggestion = 0;
-                if(currentState == State.SUGGESTION_SELECTION){
+                AdaptiveLayout.this.currentSuggestion = -1; // 0
+                if (currentState == State.SUGGESTION_SELECTION) {
                     reset(); // If the suggestions change while we are in suggestions mode we have to reset to prevent crashes.
                 }
                 AdaptiveLayout.this.notifyLayoutListeners();
             }
         });
 
-    }
-
-    /**
-     * Returns the current internal state of the layout
-     *
-     * @return the state of the layout
-     */
-    public State getCurrentState() {
-        return currentState;
     }
 
     /**
@@ -113,10 +104,8 @@ public class AdaptiveLayout extends StepLayout {
         return ROW_LENGTH;
     }
 
-    public int getCurrentSuggestion(){
-        return currentSuggestion;
-    }
-    public List<String> getSuggestions(){
+
+    public List<String> getSuggestions() {
         return suggestions;
     }
 
@@ -168,10 +157,12 @@ public class AdaptiveLayout extends StepLayout {
         }
     }
 
-    private void stepInSuggestionsMode(InputType input){
+    private void stepInSuggestionsMode(InputType input) {
         switch (input) {
             case INPUT1:
-                currentSuggestion = (currentSuggestion + 1) % suggestions.size() ;
+                if (getSuggestions().size() > 0) {
+                    currentSuggestion = (currentSuggestion + 1) % suggestions.size();
+                }
                 break;
             case INPUT2:
                 selectCurrentSuggestion();
@@ -187,7 +178,8 @@ public class AdaptiveLayout extends StepLayout {
             keyboard.sendCurrentBuffer();
             reset();
         } else if (current == Symbol.DICTIONARY) {
-            if(!suggestions.isEmpty()) {
+            if (!suggestions.isEmpty()) {
+                currentSuggestion++;
                 currentState = State.SUGGESTION_SELECTION;
             }
         } else {
@@ -196,7 +188,7 @@ public class AdaptiveLayout extends StepLayout {
         }
     }
 
-    private void selectCurrentSuggestion(){
+    private void selectCurrentSuggestion() {
         String suggestion = suggestions.get(currentSuggestion);
         suggestion = suggestion.substring(keyboard.getCurrentWord().length());
         keyboard.addToCurrentBuffer(suggestion + Symbol.SPACE.getContent());
@@ -207,7 +199,7 @@ public class AdaptiveLayout extends StepLayout {
     private void reset() {
         currentColumn = 0;
         currentRow = 0;
-        currentSuggestion = 0;
+        currentSuggestion = -1; // 0
         currentState = State.ROW_SELECTION;
         currentAdaptiveLayout = getNextOptimalLayout(getLastTypedLetter());
     }

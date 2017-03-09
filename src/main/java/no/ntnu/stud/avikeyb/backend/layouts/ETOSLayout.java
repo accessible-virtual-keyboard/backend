@@ -76,6 +76,7 @@ public class ETOSLayout extends StepLayout {
         return dictionsuggestions;
     }
 
+
     /**
      * Get the current suggestion word
      *
@@ -126,7 +127,7 @@ public class ETOSLayout extends StepLayout {
         if (currentMenuPosition < menu.length) {
             return menu[currentMenuPosition];
         }
-        System.out.println("Menu: "+ menu[currentMenuPosition]);
+        System.out.println("Menu: " + menu[currentMenuPosition]);
         System.out.println("wrong? menu");
         return null;
     }
