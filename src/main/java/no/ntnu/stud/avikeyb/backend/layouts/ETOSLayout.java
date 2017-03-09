@@ -76,6 +76,7 @@ public class ETOSLayout extends StepLayout {
         return dictionsuggestions;
     }
 
+
     /**
      * Get the current suggestion word
      *
@@ -126,8 +127,8 @@ public class ETOSLayout extends StepLayout {
         if (currentMenuPosition < menu.length) {
             return menu[currentMenuPosition];
         }
-        System.out.println("Menu: "+ menu[currentMenuPosition]);
-        System.out.println("wrong? menu");
+        System.out.println("Menu: " + menu[currentMenuPosition]);
+
         return null;
     }
 
@@ -245,7 +246,6 @@ public class ETOSLayout extends StepLayout {
      * Moving cursor to the next column.
      */
     public void nextColumn() {
-        // currentPosition = (currentPosition + 1) % getCurrentRowLength();
         currentPosition = (currentPosition + 1);
         if (currentPosition % 6 == 0) {
             currentPosition -= 6;
@@ -254,13 +254,11 @@ public class ETOSLayout extends StepLayout {
             if (currentPosition % 3 == 0) {
                 currentPosition -= 3;
             }
-            //   currentPosition = (currentPosition + 1) % 2;
-
         }
     }
 
     /**
-     * If the suggestion is not null, then move the curosr to the next entry.
+     * If the suggestion is not null, then move the cursor to the next dictionary entry.
      */
     public void nextDictionaryEntry() {
         if (getSuggestions().size() > 0) {
@@ -268,6 +266,9 @@ public class ETOSLayout extends StepLayout {
         }
     }
 
+    /**
+     * If the menu is not null, move the cursor to the next menu entry.
+     */
     public void nextMenuEntry() {
         if (menu.length > 0) {
             currentMenuPosition = (currentMenuPosition + 1) % menu.length;
