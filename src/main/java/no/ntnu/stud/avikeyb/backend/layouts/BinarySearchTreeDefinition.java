@@ -8,48 +8,7 @@ import java.util.List;
 
 import no.ntnu.stud.avikeyb.backend.Symbol;
 
-import static no.ntnu.stud.avikeyb.backend.Symbol.A;
-import static no.ntnu.stud.avikeyb.backend.Symbol.B;
-import static no.ntnu.stud.avikeyb.backend.Symbol.C;
-import static no.ntnu.stud.avikeyb.backend.Symbol.COMMA;
-import static no.ntnu.stud.avikeyb.backend.Symbol.D;
-import static no.ntnu.stud.avikeyb.backend.Symbol.E;
-import static no.ntnu.stud.avikeyb.backend.Symbol.EXCLAMATION_MARK;
-import static no.ntnu.stud.avikeyb.backend.Symbol.F;
-import static no.ntnu.stud.avikeyb.backend.Symbol.G;
-import static no.ntnu.stud.avikeyb.backend.Symbol.H;
-import static no.ntnu.stud.avikeyb.backend.Symbol.I;
-import static no.ntnu.stud.avikeyb.backend.Symbol.J;
-import static no.ntnu.stud.avikeyb.backend.Symbol.K;
-import static no.ntnu.stud.avikeyb.backend.Symbol.L;
-import static no.ntnu.stud.avikeyb.backend.Symbol.M;
-import static no.ntnu.stud.avikeyb.backend.Symbol.N;
-import static no.ntnu.stud.avikeyb.backend.Symbol.NUM_0;
-import static no.ntnu.stud.avikeyb.backend.Symbol.NUM_1;
-import static no.ntnu.stud.avikeyb.backend.Symbol.NUM_2;
-import static no.ntnu.stud.avikeyb.backend.Symbol.NUM_3;
-import static no.ntnu.stud.avikeyb.backend.Symbol.NUM_4;
-import static no.ntnu.stud.avikeyb.backend.Symbol.NUM_5;
-import static no.ntnu.stud.avikeyb.backend.Symbol.NUM_6;
-import static no.ntnu.stud.avikeyb.backend.Symbol.NUM_7;
-import static no.ntnu.stud.avikeyb.backend.Symbol.NUM_8;
-import static no.ntnu.stud.avikeyb.backend.Symbol.NUM_9;
-import static no.ntnu.stud.avikeyb.backend.Symbol.O;
-import static no.ntnu.stud.avikeyb.backend.Symbol.P;
-import static no.ntnu.stud.avikeyb.backend.Symbol.PERIOD;
-import static no.ntnu.stud.avikeyb.backend.Symbol.Q;
-import static no.ntnu.stud.avikeyb.backend.Symbol.QUESTION_MARK;
-import static no.ntnu.stud.avikeyb.backend.Symbol.R;
-import static no.ntnu.stud.avikeyb.backend.Symbol.S;
-import static no.ntnu.stud.avikeyb.backend.Symbol.SEND;
-import static no.ntnu.stud.avikeyb.backend.Symbol.SPACE;
-import static no.ntnu.stud.avikeyb.backend.Symbol.T;
-import static no.ntnu.stud.avikeyb.backend.Symbol.U;
-import static no.ntnu.stud.avikeyb.backend.Symbol.V;
-import static no.ntnu.stud.avikeyb.backend.Symbol.W;
-import static no.ntnu.stud.avikeyb.backend.Symbol.X;
-import static no.ntnu.stud.avikeyb.backend.Symbol.Y;
-import static no.ntnu.stud.avikeyb.backend.Symbol.Z;
+import static no.ntnu.stud.avikeyb.backend.Symbol.*;
 
 /**
  * Defines the selection tree for the binary search layout.
@@ -96,7 +55,7 @@ public class BinarySearchTreeDefinition {
 
         //@formatter:off
         return
-        d(s(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, SPACE, SEND, NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9, COMMA, PERIOD, EXCLAMATION_MARK, QUESTION_MARK), suggestions,
+        d(s(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, SPACE, SEND, NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9, COMMA, PERIOD, EXCLAMATION_MARK, QUESTION_MARK, BACKSPACE, DELETE_WORD), suggestions,
             n(s(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, SPACE, SEND),
                 n(s(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P),
                     n(s(A, B, E, F, I, J, M, N),
@@ -124,8 +83,8 @@ public class BinarySearchTreeDefinition {
                             l(S, T),
                             l(W, X)),
                         l(SPACE, SEND)))),
-            d(s(NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9, PERIOD, COMMA, QUESTION_MARK, EXCLAMATION_MARK), suggestions,
-                n(s(NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9, PERIOD, COMMA, QUESTION_MARK, EXCLAMATION_MARK),
+            d(s(NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9, PERIOD, COMMA, QUESTION_MARK, EXCLAMATION_MARK, BACKSPACE, DELETE_WORD), suggestions,
+                n(s(NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9, PERIOD, COMMA, QUESTION_MARK, EXCLAMATION_MARK, BACKSPACE, DELETE_WORD),
                     n(s(NUM_0, NUM_1, NUM_4, NUM_5, NUM_8, NUM_9, PERIOD, COMMA),
                         n(s(NUM_0, NUM_1, NUM_4, NUM_5),
                             l(NUM_0, NUM_1),
@@ -133,11 +92,13 @@ public class BinarySearchTreeDefinition {
                         n(s(NUM_8, NUM_9, PERIOD, COMMA),
                             l(NUM_8, NUM_9),
                             l(PERIOD, COMMA))),
-                    n(s(NUM_2, NUM_3, NUM_6, NUM_7, QUESTION_MARK, EXCLAMATION_MARK),
+                    n(s(NUM_2, NUM_3, NUM_6, NUM_7, QUESTION_MARK, EXCLAMATION_MARK, BACKSPACE, DELETE_WORD),
                         n(s(NUM_2, NUM_3, NUM_6, NUM_7),
                             l(NUM_2, NUM_3),
                             l(NUM_6, NUM_7)),
-                        l(QUESTION_MARK, EXCLAMATION_MARK))),
+                        n(s(QUESTION_MARK, EXCLAMATION_MARK, BACKSPACE, DELETE_WORD),
+                            l(QUESTION_MARK, EXCLAMATION_MARK),
+                            l(BACKSPACE, DELETE_WORD)))),
                 suggestionNode(suggestions)));
         //@formatter:on
     }

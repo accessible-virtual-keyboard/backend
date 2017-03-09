@@ -18,7 +18,7 @@ public class BinarySearchLayout extends StepLayout {
 
     private static Symbol[] symbols = Symbols.merge(
             Symbols.alphabet(),
-            Symbols.build(Symbol.SPACE, Symbol.SEND),
+            Symbols.build(Symbol.SPACE, Symbol.SEND, Symbol.BACKSPACE, Symbol.DELETE_WORD),
             Symbols.numbers(),
             Symbols.commonPunctuations());
 
@@ -167,7 +167,13 @@ public class BinarySearchLayout extends StepLayout {
     private void selectSymbol(Symbol symbol) {
         if (symbol == Symbol.SEND) {
             keyboard.sendCurrentBuffer();
-        } else {
+        }else if(symbol == Symbol.BACKSPACE){
+            keyboard.deleteLastCharacter();
+        }
+        else if(symbol == Symbol.DELETE_WORD){
+            keyboard.deleteLastWord();
+        }
+        else {
             keyboard.addToCurrentBuffer(symbol.getContent());
         }
     }
