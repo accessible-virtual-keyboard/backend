@@ -37,6 +37,8 @@ public class ETOSLayout extends StepLayout {
 
     // the current position of the cursor in the dictionary
     private int currentDictionaryPosition = -1;
+    // the current position of the cursor in the menu
+    private int currentMenuPosition = -1;
     // The current row of the cursor in the layout.
     private State state = State.SELECT_ROW;
     private Keyboard keyboard;
@@ -59,6 +61,15 @@ public class ETOSLayout extends StepLayout {
                 notifyLayoutListeners();
             }
         });
+    }
+
+    /**
+     * Get the current internal state of the layout
+     *
+     * @return the state of the layout
+     */
+    public State getState() {
+        return state;
     }
 
     public List<String> getSuggestions() {
@@ -98,14 +109,24 @@ public class ETOSLayout extends StepLayout {
         return currentPosition;
     }
 
+    public int getCurrentMenuPosition() {
+        return currentMenuPosition;
+    }
+
+    /**
+     * Returns the current active position in the dictionary
+     *
+     * @return the position of the current active dictionary string.
+     */
     public int getCurrentDictionaryPosition() {
         return currentDictionaryPosition;
     }
 
     public Symbol getCurrentMenu() {
-        if (currentPosition < menu.length) {
-            return menu[currentPosition];
+        if (currentMenuPosition < menu.length) {
+            return menu[currentMenuPosition];
         }
+        System.out.println("Menu: "+ menu[currentMenuPosition]);
         System.out.println("wrong? menu");
         return null;
     }
@@ -194,11 +215,15 @@ public class ETOSLayout extends StepLayout {
             case SELECT_MENU:
                 switch (input) {
                     case INPUT1:
-                        nextColumn();
+                        nextMenuEntry();
+
                         break;
                     case INPUT2:
-
                         getCurrentMenu();
+                        currentPosition = 0;
+                        currentDictionaryPosition = -1; //todo test
+                        currentMenuPosition = -1;
+                        state = State.SELECT_ROW;
                         break;
                 }
                 break;
@@ -241,6 +266,13 @@ public class ETOSLayout extends StepLayout {
         if (getSuggestions().size() > 0) {
             currentDictionaryPosition = (currentDictionaryPosition + 1) % getSuggestions().size();
         }
+    }
+
+    public void nextMenuEntry() {
+        if (menu.length > 0) {
+            currentMenuPosition = (currentMenuPosition + 1) % menu.length;
+        }
+
     }
 
     /**
