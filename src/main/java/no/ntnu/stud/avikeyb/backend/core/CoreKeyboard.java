@@ -83,10 +83,46 @@ public class CoreKeyboard implements Keyboard {
         notifyBufferChanged(oldBuffer, getCurrentBuffer());
     }
 
+    @Override
+    public void deleteLastWord() {
+        String buffer = getCurrentBuffer();
+        if(!buffer.isEmpty()){
+            int clearFromIndex = 0;
+            int lastSpace = buffer.replaceAll("\\s+$","").lastIndexOf(" ");
+            if(lastSpace != -1){
+                clearFromIndex = lastSpace + 1;
+            }
+            String newBuffer = clearBufferAfter(clearFromIndex);
+            notifyBufferChanged(buffer, newBuffer);
+        }
+
+    }
+
+    @Override
+    public void deleteLastCharacter() {
+        String buffer = getCurrentBuffer();
+        if(!buffer.isEmpty()){
+            String newBuffer = clearBufferAfter(buffer.length()-1);
+            notifyBufferChanged(buffer, newBuffer);
+        }
+
+    }
 
     private void notifyBufferChanged(String oldBuffer, String newBuffer) {
         for (KeyboardListener listener : listeners) {
             listener.onOutputBufferChange(oldBuffer, newBuffer);
         }
+    }
+
+    private String clearBufferAfter(int index){
+        String oldBuffer = getCurrentBuffer();
+        String newBuffer = oldBuffer.substring(0, index);
+        replaceBuffer(newBuffer);
+        return newBuffer;
+    }
+
+    private void replaceBuffer(String newBuffer){
+        currentBuffer.setLength(0);
+        currentBuffer.append(newBuffer);
     }
 }

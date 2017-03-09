@@ -48,6 +48,82 @@ public class CoreKeyboardTest {
     }
 
     @Test
+    public void testDeleteLastCharacter() throws Exception {
+
+        keyboard.addToCurrentBuffer("hello");
+
+        keyboard.deleteLastCharacter();
+        assertEquals("hell", keyboard.getCurrentBuffer());
+        keyboard.deleteLastCharacter();
+        assertEquals("hel", keyboard.getCurrentBuffer());
+
+
+        keyboard.clearCurrentBuffer();
+        keyboard.addToCurrentBuffer("hello t");
+
+        keyboard.deleteLastCharacter();
+        assertEquals("hello ", keyboard.getCurrentBuffer());
+        keyboard.deleteLastCharacter();
+        assertEquals("hello", keyboard.getCurrentBuffer());
+        keyboard.deleteLastCharacter();
+        assertEquals("hell", keyboard.getCurrentBuffer());
+
+        keyboard.clearCurrentBuffer();
+        keyboard.addToCurrentBuffer("h");
+        assertEquals("h", keyboard.getCurrentBuffer());
+        keyboard.deleteLastCharacter();
+        assertEquals("", keyboard.getCurrentBuffer());
+        keyboard.deleteLastCharacter();
+        assertEquals("", keyboard.getCurrentBuffer());
+    }
+
+
+    @Test
+    public void testDeleteLastWord() throws Exception {
+
+        keyboard.addToCurrentBuffer("hello this is a test");
+
+        keyboard.deleteLastWord();
+        assertEquals("hello this is a ", keyboard.getCurrentBuffer());
+
+        keyboard.deleteLastWord();
+        assertEquals("hello this is ", keyboard.getCurrentBuffer());
+
+        keyboard.deleteLastWord();
+        assertEquals("hello this ", keyboard.getCurrentBuffer());
+
+        keyboard.deleteLastWord();
+        assertEquals("hello ", keyboard.getCurrentBuffer());
+
+        keyboard.deleteLastWord();
+        assertEquals("", keyboard.getCurrentBuffer());
+
+        keyboard.deleteLastWord();
+        assertEquals("", keyboard.getCurrentBuffer());
+    }
+
+    @Test
+    public void testDeleteLastWordWithSpecialChars() throws Exception {
+
+        keyboard.addToCurrentBuffer("hello test! hi?! 234    !!!3");
+
+        keyboard.deleteLastWord();
+        assertEquals("hello test! hi?! 234    ", keyboard.getCurrentBuffer());
+
+        keyboard.deleteLastWord();
+        assertEquals("hello test! hi?! ", keyboard.getCurrentBuffer());
+
+        keyboard.deleteLastWord();
+        assertEquals("hello test! ", keyboard.getCurrentBuffer());
+
+        keyboard.deleteLastWord();
+        assertEquals("hello ", keyboard.getCurrentBuffer());
+
+        keyboard.deleteLastWord();
+        assertEquals("", keyboard.getCurrentBuffer());
+    }
+
+    @Test
     public void testSendCurrentBuffer() throws Exception {
 
         OutputLogger output = new OutputLogger();

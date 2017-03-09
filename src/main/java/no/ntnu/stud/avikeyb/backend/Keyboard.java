@@ -54,6 +54,18 @@ public interface Keyboard {
      */
     void clearCurrentBuffer();
 
+
+    /**
+     * Removes the last typed word from the output buffer
+     */
+    void deleteLastWord();
+
+
+    /**
+     * Removes the last typed character from the output buffer
+     */
+    void deleteLastCharacter();
+
     /**
      * Register an output device to the keyboard
      *
