@@ -201,6 +201,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
         for (DictionaryEntry dictionaryEntry : this.dictionary) {
             if (dictionaryEntry.getWord().equals(string)) {
                 dictionaryEntry.setUserFrequency(dictionaryEntry.getUserFrequency() + 1);
+                updateMostWords(dictionaryEntry);
                 wordExist = true;
             }
         }
