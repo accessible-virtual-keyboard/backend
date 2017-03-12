@@ -11,6 +11,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
 
     private List<DictionaryEntry> dictionary;
     private PriorityQueue<DictionaryEntry> mostUsedWords;
+    private Map<String, DictionaryEntry> dictionaryEntryLookup; // used to speed up frequency updates
 
     /**
      * Constructs a dictionary handler with an empty dictionary.
@@ -28,7 +29,9 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
     public DictionaryHandler(List<DictionaryEntry> dictionary) {
         this.dictionary = dictionary;
         this.mostUsedWords = new PriorityQueue<>(21, dictionaryEntryComparatorLeastUsedFirst());
+        this.dictionaryEntryLookup = new HashMap<>();
         updateMostWords(dictionary);
+        updateEntryLookup(dictionary);
         sortDictionary();
     }
 
@@ -156,6 +159,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
         DictionaryEntry entry = new DictionaryEntry(word, standardFrequency, userFrequency);
         dictionary.add(entry);
         updateMostWords(entry);
+        updateEntryLookup(entry);
         sortDictionary();
         return 1;
     }
@@ -196,16 +200,11 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
 
     @Override
     public void updateWordUsage(String string) {
-        boolean wordExist = false;
-        // First find the word in the dictionary and update it if it exists.
-        for (DictionaryEntry dictionaryEntry : this.dictionary) {
-            if (dictionaryEntry.getWord().equals(string)) {
-                dictionaryEntry.setUserFrequency(dictionaryEntry.getUserFrequency() + 1);
-                updateMostWords(dictionaryEntry);
-                wordExist = true;
-            }
-        }
-        if (!wordExist) {
+        if (dictionaryEntryLookup.containsKey(string)) {
+            DictionaryEntry entry = dictionaryEntryLookup.get(string);
+            entry.setUserFrequency(entry.getUserFrequency() + 1);
+            updateMostWords(entry);
+        }else{
             // Word does not exist in dictionary. Add it.
             addWordToDictionary(string, 0, 1);
         }
@@ -261,6 +260,16 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
                 return cmp;
             }
         };
+    }
+
+    private void updateEntryLookup(List<DictionaryEntry> entries){
+        for(DictionaryEntry entry : entries){
+            dictionaryEntryLookup.put(entry.getWord(), entry);
+        }
+    }
+
+    private void updateEntryLookup(DictionaryEntry entry){
+        dictionaryEntryLookup.put(entry.getWord(), entry);
     }
 
     private void updateMostWords(List<DictionaryEntry> entries){
