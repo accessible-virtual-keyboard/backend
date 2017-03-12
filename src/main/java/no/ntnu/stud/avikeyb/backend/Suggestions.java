@@ -6,9 +6,8 @@ import java.util.List;
 /**
  * Defines the interface of the suggestion engine.
  * <p>
- * Objects of this class will listen to the keyboard and find suggested words as new characters
- * are added to the keyboard output buffer. Someone interested in the suggestion can register
- * an WordHistory.Listener to be notified when new suggestions are found.
+ * To find suggestions the findSuggestionsStartingWith method must be called. When the suggestions are found
+ * any Suggestions.Listener listening for suggestions will be to be notified about the found suggestions.
  * <p>
  * This class does not implement the actual search as the search may need to talk to an
  * database or do other long running tasks that could block when used with a gui library.
@@ -31,13 +30,10 @@ public abstract class Suggestions {
         void onSuggestions(List<String> suggestions);
     }
 
-    private Keyboard keyboard;
     private List<Suggestions.Listener> listeners;
 
-    public Suggestions(Keyboard keyboard) {
-        this.keyboard = keyboard;
+    public Suggestions() {
         listeners = new ArrayList<>();
-        setupKeyboardListener();
     }
 
     /**
@@ -57,6 +53,17 @@ public abstract class Suggestions {
     public void removeListener(Suggestions.Listener listener) {
         listeners.remove(listener);
     }
+
+
+    /**
+     * Find suggestions for words starting with the given prefix
+     *
+     * @param prefix the prefix to search for
+     */
+    public void findSuggestionsStartingWith(String prefix){
+        executeQuery(prefix);
+    }
+
 
     /**
      * Find suggestions for the given word
@@ -81,16 +88,6 @@ public abstract class Suggestions {
         for (Suggestions.Listener listener : listeners) {
             listener.onSuggestions(suggestions);
         }
-    }
-
-
-    private void setupKeyboardListener() {
-        keyboard.addStateListener(new Keyboard.KeyboardListener() {
-            @Override
-            public void onOutputBufferChange(String oldBuffer, String newBuffer) {
-                executeQuery(keyboard.getCurrentWord());
-            }
-        });
     }
 
 }

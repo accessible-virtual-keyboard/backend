@@ -12,8 +12,8 @@ public class SingleThreadSuggestions extends Suggestions {
 
     private Dictionary dictionary;
 
-    public SingleThreadSuggestions(Keyboard keyboard, Dictionary dictionary) {
-        super(keyboard);
+    public SingleThreadSuggestions(Dictionary dictionary) {
+        super();
         this.dictionary = dictionary;
     }
 
