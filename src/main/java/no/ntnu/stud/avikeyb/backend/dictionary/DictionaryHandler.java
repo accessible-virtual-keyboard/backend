@@ -1,9 +1,6 @@
 package no.ntnu.stud.avikeyb.backend.dictionary;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Handles dictionary functions.
@@ -13,6 +10,7 @@ import java.util.List;
 public class DictionaryHandler implements Dictionary, InMemoryDictionary {
 
     private List<DictionaryEntry> dictionary;
+    private PriorityQueue<DictionaryEntry> mostUsedWords;
 
     /**
      * Constructs a dictionary handler with an empty dictionary.
@@ -29,6 +27,8 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
      */
     public DictionaryHandler(List<DictionaryEntry> dictionary) {
         this.dictionary = dictionary;
+        this.mostUsedWords = new PriorityQueue<>(21, dictionaryEntryComparator());
+        updateMostWords(dictionary);
         sortDictionary();
     }
 
@@ -60,9 +60,9 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
             return new ArrayList<String>();
         }
 
-        // Return all words sorted by use frequency when the search string is empty
+        // Return the most used words sorted by use frequency when the search string is empty
         if(prefix.isEmpty()){
-            return sortAndExtractSuggestions(new ArrayList<>(dictionary));
+            return sortAndExtractSuggestions(Arrays.asList(mostUsedWords.toArray(new DictionaryEntry[]{})));
         }
 
 
@@ -153,7 +153,9 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
                 return -1;
             }
         }
-        dictionary.add(new DictionaryEntry(word, standardFrequency, userFrequency));
+        DictionaryEntry entry = new DictionaryEntry(word, standardFrequency, userFrequency);
+        dictionary.add(entry);
+        updateMostWords(entry);
         sortDictionary();
         return 1;
     }
@@ -211,6 +213,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
     @Override
     public void setDictionary(List<DictionaryEntry> dictionary) {
         this.dictionary = dictionary;
+        updateMostWords(dictionary);
         sortDictionary();
     }
 
@@ -242,5 +245,48 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
             suggestions.add(dictionaryEntry.getWord());
         }
         return suggestions;
+    }
+
+    // Compare by user frequency and standard frequency
+    private Comparator<DictionaryEntry> dictionaryEntryComparator(){
+        return new Comparator<DictionaryEntry>() {
+            @Override
+            public int compare(DictionaryEntry d1, DictionaryEntry d2) {
+                int cmp = Integer.compare(d1.getUserFrequency(), d2.getUserFrequency());
+                if(cmp == 0){
+                    cmp = Integer.compare(d1.getStandardFrequency(), d2.getStandardFrequency());
+                }
+                return cmp;
+            }
+        };
+    }
+
+    private void updateMostWords(List<DictionaryEntry> entries){
+        for(DictionaryEntry ent : entries){
+            updateMostWords(ent);
+        }
+    }
+
+
+    // Update top word usage.
+    private void updateMostWords(DictionaryEntry entry){
+
+        DictionaryEntry leastEntry = mostUsedWords.peek();
+
+        // Because the standard java priority queue can not be capped to a specific size we have to do it manually
+        // Keep only the 20 most used words
+        if(mostUsedWords.size() >= 20) {
+
+            int cmp = mostUsedWords.comparator().compare(leastEntry, entry);
+
+            if (cmp < 0) {
+                // This new entry is larger than the current least entry so we remove the least entry
+                // and add the new
+                mostUsedWords.poll();
+                mostUsedWords.add(entry);
+            }
+        }else {
+            mostUsedWords.add(entry);
+        }
     }
 }
