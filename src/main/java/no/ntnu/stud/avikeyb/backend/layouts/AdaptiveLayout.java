@@ -1,13 +1,12 @@
 package no.ntnu.stud.avikeyb.backend.layouts;
 
+import no.ntnu.stud.avikeyb.backend.InputType;
+import no.ntnu.stud.avikeyb.backend.Keyboard;
+import no.ntnu.stud.avikeyb.backend.Symbol;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import no.ntnu.stud.avikeyb.backend.InputType;
-import no.ntnu.stud.avikeyb.backend.Keyboard;
-import no.ntnu.stud.avikeyb.backend.Suggestions;
-import no.ntnu.stud.avikeyb.backend.Symbol;
 
 /**
  * The adaptive layout changes the order of the letters as the user types. After each typed letter,
@@ -15,7 +14,7 @@ import no.ntnu.stud.avikeyb.backend.Symbol;
  * to follow the last typed letter are placed at the positions that requires the least amount
  * of steps to be selected in the layout.
  */
-public class AdaptiveLayout extends StepLayout {
+public class AdaptiveLayout extends StepLayout implements LayoutWithSuggestions {
 
     /**
      * The states that the layout can be in
@@ -42,25 +41,22 @@ public class AdaptiveLayout extends StepLayout {
     private List<String> suggestions = new ArrayList<>();
 
 
-    public AdaptiveLayout(Keyboard keyboard, Suggestions suggestions) {
+    public AdaptiveLayout(Keyboard keyboard) {
         this.keyboard = keyboard;
         // Create the optimal layout map and reset to set the current layout based on the
         // keyboard's current output buffer.
         optimalLayoutMap = createSymbolLayoutMap();
         reset();
+    }
 
-        suggestions.addListener(new Suggestions.Listener() {
-            @Override
-            public void onSuggestions(List<String> suggestions1) {
-                AdaptiveLayout.this.suggestions = new ArrayList<>(suggestions1.subList(0, Math.min(6, suggestions1.size())));
-                AdaptiveLayout.this.currentSuggestion = -1; // 0
-                if (currentState == State.SUGGESTION_SELECTION) {
-                    reset(); // If the suggestions change while we are in suggestions mode we have to reset to prevent crashes.
-                }
-                AdaptiveLayout.this.notifyLayoutListeners();
-            }
-        });
-
+    @Override
+    public void setSuggestions(List<String> suggestions) {
+        this.suggestions = new ArrayList<>(suggestions.subList(0, Math.min(6, suggestions.size())));
+        this.currentSuggestion = -1; // 0
+        if (currentState == State.SUGGESTION_SELECTION) {
+            reset(); // If the suggestions change while we are in suggestions mode we have to reset to prevent crashes.
+        }
+        notifyLayoutListeners();
     }
 
     /**

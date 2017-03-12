@@ -1,20 +1,19 @@
 package no.ntnu.stud.avikeyb.backend.layouts;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import no.ntnu.stud.avikeyb.backend.InputType;
 import no.ntnu.stud.avikeyb.backend.Keyboard;
-import no.ntnu.stud.avikeyb.backend.Suggestions;
 import no.ntnu.stud.avikeyb.backend.Symbol;
 import no.ntnu.stud.avikeyb.backend.Symbols;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ingalill on 10/02/2017.
  */
 
-public class ETOSLayout extends StepLayout {
+public class ETOSLayout extends StepLayout implements LayoutWithSuggestions {
 
     private static Symbol[] symbols = Symbols.merge(
             Symbols.build(Symbol.SEND),
@@ -24,6 +23,7 @@ public class ETOSLayout extends StepLayout {
     );
 
     private static Symbol[] menu = Symbols.menuOptions();
+
 
     public enum State {
         SELECT_ROW,
@@ -45,22 +45,17 @@ public class ETOSLayout extends StepLayout {
 
     private List<String> dictionsuggestions = new ArrayList<>();
 
-    private Suggestions suggestionEngine;
 
-
-    public ETOSLayout(Keyboard keyboard, Suggestions suggestions) {
+    public ETOSLayout(Keyboard keyboard) {
         this.keyboard = keyboard;
-        this.suggestionEngine = suggestions;
+    }
 
-        // Listen for suggestions
-        suggestionEngine.addListener(new Suggestions.Listener() {
-            @Override
-            public void onSuggestions(List<String> suggestions1) {
-                dictionsuggestions.clear();
-                dictionsuggestions.addAll(suggestions1);
-                notifyLayoutListeners();
-            }
-        });
+
+    @Override
+    public void setSuggestions(List<String> suggestions) {
+        dictionsuggestions.clear();
+        dictionsuggestions.addAll(suggestions);
+        notifyLayoutListeners();
     }
 
     /**

@@ -1,19 +1,18 @@
 package no.ntnu.stud.avikeyb.backend.layouts;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import no.ntnu.stud.avikeyb.backend.InputType;
 import no.ntnu.stud.avikeyb.backend.Keyboard;
-import no.ntnu.stud.avikeyb.backend.Suggestions;
 import no.ntnu.stud.avikeyb.backend.Symbol;
 import no.ntnu.stud.avikeyb.backend.Symbols;
 import no.ntnu.stud.avikeyb.backend.layouts.util.LayoutState;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Basic binary search layout
  */
-public class BinarySearchLayout extends StepLayout {
+public class BinarySearchLayout extends StepLayout implements LayoutWithSuggestions {
 
 
     private static Symbol[] symbols = Symbols.merge(
@@ -24,16 +23,13 @@ public class BinarySearchLayout extends StepLayout {
 
 
     private Keyboard keyboard;
-    private Suggestions suggestionsEngine;
     private List<String> suggestions = new ArrayList<>();
 
     private BinarySearchTreeDefinition.Node currentNode;
 
-    public BinarySearchLayout(Keyboard keyboard, Suggestions suggestionsEngine) {
+    public BinarySearchLayout(Keyboard keyboard) {
         this.keyboard = keyboard;
-        this.suggestionsEngine = suggestionsEngine;
         reset();
-        listenForSuggestions();
     }
 
     /**
@@ -127,6 +123,13 @@ public class BinarySearchLayout extends StepLayout {
 
 
     @Override
+    public void setSuggestions(List<String> suggestions) {
+        this.suggestions = new ArrayList<>(suggestions.subList(0, Math.min(7, suggestions.size())));
+        reset();
+        notifyLayoutListeners();
+    }
+
+    @Override
     protected void onStep(InputType input) {
 
         // Select the correct side and split it into the new left and right side
@@ -196,23 +199,6 @@ public class BinarySearchLayout extends StepLayout {
     // Rebuild the selection tree so that the user can start typing something new
     private void reset() {
         currentNode = BinarySearchTreeDefinition.buildBinarySearchLayoutTree(suggestions);
-    }
-
-    // Listen for suggestions and add new suggestions to the layout
-    private void listenForSuggestions() {
-
-        suggestionsEngine.addListener(new Suggestions.Listener() {
-            @Override
-            public void onSuggestions(List<String> suggestions1) {
-                // Take only the 7 first suggestions. A new list is needed to copy the items because
-                // the sub list will keep a reference to the underlying list an keep it from
-                // getting garbage collected.
-                suggestions = new ArrayList<>(suggestions1.subList(0, Math.min(7, suggestions1.size())));
-                BinarySearchLayout.this.reset();
-                BinarySearchLayout.this.notifyLayoutListeners();
-            }
-        });
-
     }
 
 }
