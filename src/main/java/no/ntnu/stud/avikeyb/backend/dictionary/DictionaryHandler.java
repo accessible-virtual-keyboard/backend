@@ -27,7 +27,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
      */
     public DictionaryHandler(List<DictionaryEntry> dictionary) {
         this.dictionary = dictionary;
-        this.mostUsedWords = new PriorityQueue<>(21, dictionaryEntryComparator());
+        this.mostUsedWords = new PriorityQueue<>(21, dictionaryEntryComparatorLeastUsedFirst());
         updateMostWords(dictionary);
         sortDictionary();
     }
@@ -224,21 +224,8 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
 
 
     private List<String> sortAndExtractSuggestions(List<DictionaryEntry> entries){
-        // Sort list by the words standard frequency of occurrence.
-        Collections.sort(entries, new Comparator<DictionaryEntry>() {
-            @Override
-            public int compare(DictionaryEntry o1, DictionaryEntry o2) {
-                return o2.getStandardFrequency() - o1.getStandardFrequency();
-            }
-        });
-        // Sort list by the words user frequency of occurrence.
-        Collections.sort(entries, new Comparator<DictionaryEntry>() {
-            @Override
-            public int compare(DictionaryEntry o1, DictionaryEntry o2) {
-                return o2.getUserFrequency() - o1.getUserFrequency();
-            }
-        });
 
+        Collections.sort(entries, dictionaryEntryComparatorMostUsedFirst());
         List<String> suggestions = new ArrayList<>();
         // Get only the words.
         for (DictionaryEntry dictionaryEntry : entries) {
@@ -248,7 +235,21 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
     }
 
     // Compare by user frequency and standard frequency
-    private Comparator<DictionaryEntry> dictionaryEntryComparator(){
+    private Comparator<DictionaryEntry> dictionaryEntryComparatorMostUsedFirst(){
+        return new Comparator<DictionaryEntry>() {
+            @Override
+            public int compare(DictionaryEntry d1, DictionaryEntry d2) {
+                int cmp = Integer.compare(d2.getUserFrequency(), d1.getUserFrequency());
+                if(cmp == 0){
+                    cmp = Integer.compare(d2.getStandardFrequency(), d1.getStandardFrequency());
+                }
+                return cmp;
+            }
+        };
+    }
+
+    // Compare by user frequency and standard frequency
+    private Comparator<DictionaryEntry> dictionaryEntryComparatorLeastUsedFirst(){
         return new Comparator<DictionaryEntry>() {
             @Override
             public int compare(DictionaryEntry d1, DictionaryEntry d2) {
