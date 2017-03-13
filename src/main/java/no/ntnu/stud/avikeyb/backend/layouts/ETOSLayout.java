@@ -47,6 +47,7 @@ public class ETOSLayout extends StepLayout implements LayoutWithSuggestions {
 
 
     public ETOSLayout(Keyboard keyboard) {
+        this.keyboard = keyboard;
 
     }
 
