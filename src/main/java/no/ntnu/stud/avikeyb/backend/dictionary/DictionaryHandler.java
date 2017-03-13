@@ -30,7 +30,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
         this.dictionary = dictionary;
         this.mostUsedWords = new PriorityQueue<>(21, dictionaryEntryComparatorLeastUsedFirst());
         this.dictionaryEntryLookup = new HashMap<>();
-        updateMostWords(dictionary);
+        updateMostUsedWords(dictionary);
         updateEntryLookup(dictionary);
         sortDictionary();
     }
@@ -158,7 +158,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
         }
         DictionaryEntry entry = new DictionaryEntry(word, standardFrequency, userFrequency);
         dictionary.add(entry);
-        updateMostWords(entry);
+        updateMostUsedWords(entry);
         updateEntryLookup(entry);
         sortDictionary();
         return 1;
@@ -203,7 +203,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
         if (dictionaryEntryLookup.containsKey(string.toLowerCase())) {
             DictionaryEntry entry = dictionaryEntryLookup.get(string);
             entry.setUserFrequency(entry.getUserFrequency() + 1);
-            updateMostWords(entry);
+            updateMostUsedWords(entry);
         }else{
             // Word does not exist in dictionary. Add it.
             addWordToDictionary(string, 0, 1);
@@ -213,7 +213,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
     @Override
     public void setDictionary(List<DictionaryEntry> dictionary) {
         this.dictionary = dictionary;
-        updateMostWords(dictionary);
+        updateMostUsedWords(dictionary);
         sortDictionary();
     }
 
@@ -272,15 +272,15 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
         dictionaryEntryLookup.put(entry.getWord().toLowerCase(), entry);
     }
 
-    private void updateMostWords(List<DictionaryEntry> entries){
+    private void updateMostUsedWords(List<DictionaryEntry> entries){
         for(DictionaryEntry ent : entries){
-            updateMostWords(ent);
+            updateMostUsedWords(ent);
         }
     }
 
 
     // Update top word usage.
-    private void updateMostWords(DictionaryEntry entry){
+    private void updateMostUsedWords(DictionaryEntry entry){
 
         DictionaryEntry leastEntry = mostUsedWords.peek();
 
