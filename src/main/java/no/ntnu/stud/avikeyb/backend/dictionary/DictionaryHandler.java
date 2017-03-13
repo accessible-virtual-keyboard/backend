@@ -200,7 +200,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
 
     @Override
     public void updateWordUsage(String string) {
-        if (dictionaryEntryLookup.containsKey(string)) {
+        if (dictionaryEntryLookup.containsKey(string.toLowerCase())) {
             DictionaryEntry entry = dictionaryEntryLookup.get(string);
             entry.setUserFrequency(entry.getUserFrequency() + 1);
             updateMostWords(entry);
@@ -264,12 +264,12 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
 
     private void updateEntryLookup(List<DictionaryEntry> entries){
         for(DictionaryEntry entry : entries){
-            dictionaryEntryLookup.put(entry.getWord(), entry);
+            updateEntryLookup(entry);
         }
     }
 
     private void updateEntryLookup(DictionaryEntry entry){
-        dictionaryEntryLookup.put(entry.getWord(), entry);
+        dictionaryEntryLookup.put(entry.getWord().toLowerCase(), entry);
     }
 
     private void updateMostWords(List<DictionaryEntry> entries){
