@@ -3,6 +3,7 @@ package no.ntnu.stud.avikeyb.backend.dictionary;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -224,6 +225,34 @@ public abstract class DictionaryTester {
         List<String> res = dictionary.getSuggestionsStartingWith("");
         assertThat(res, is(Arrays.asList("test1", "test3", "hello", "cake", "test2", "testing6", "testing7", "testing4", "testing5")));
     }
+
+
+    @Test
+    public void testNewWords() throws Exception {
+
+        Dictionary dictionary = createDictionary(new ArrayList<DictionaryEntry>(Arrays.asList(
+                de("test1", 1),
+                de("test2", 10),
+                de("test3", 4),
+                de("testing4", 2),
+                de("testing5", 2),
+                de("testing6", 8),
+                de("testing7", 4)
+        )));
+
+        dictionary.updateWordUsage("tester");
+        List<String> res = dictionary.getSuggestionsStartingWith("test");
+
+        assertThat(res, is(Arrays.asList("tester", "test2", "testing6", "test3", "testing7", "testing4", "testing5", "test1")));
+
+
+        dictionary.updateWordUsage("test3");
+        res = dictionary.getSuggestionsStartingWith("test");
+
+        assertThat(res, is(Arrays.asList("test3", "tester", "test2", "testing6", "testing7", "testing4", "testing5", "test1")));
+
+    }
+
 
     private DictionaryEntry de(String word, int frequency) {
         return new DictionaryEntry(word, frequency, 0);
