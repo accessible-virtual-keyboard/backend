@@ -32,8 +32,6 @@ public class ETOSLayout extends StepLayout implements LayoutWithSuggestions {
         SELECT_DICTIONARY,
     }
 
-    // The current position of the cursor in the layout
-    private int currentPosition = 0;
 
     // the current position of the cursor in the dictionary
     private int currentDictionaryPosition = -1;
@@ -51,8 +49,9 @@ public class ETOSLayout extends StepLayout implements LayoutWithSuggestions {
 
     }
 
-    // todo
+    // The current row of the cursor
     private int currentRow = 0;
+    // the current column of the cursor
     private int currentColumn = 0;
     private static final int ROW_LENGTH = 6;
 
@@ -143,15 +142,6 @@ public class ETOSLayout extends StepLayout implements LayoutWithSuggestions {
     }
 
 
-    /**
-     * Returns the current active position in the layout
-     *
-     * @return the position of the current active symbol
-     */
-    public int getCurrentPosition() {
-        return currentPosition;
-    }
-
     public int getCurrentMenuPosition() {
         return currentMenuPosition;
     }
@@ -176,13 +166,6 @@ public class ETOSLayout extends StepLayout implements LayoutWithSuggestions {
     }
 
     public Symbol getCurrentSymbol() {
-        /*
-        if (currentPosition < symbols.length) {
-            return symbols[currentPosition];
-        } else {
-            currentPosition = 0;
-            return symbols[currentPosition];
-        }*/
         Symbol current = symbols[currentRow * ROW_LENGTH + currentColumn];
         return current;
     }
@@ -287,31 +270,14 @@ public class ETOSLayout extends StepLayout implements LayoutWithSuggestions {
      * Moving cursor to the next row
      */
     public void nextRow() {
-
         currentRow = (currentRow + 1) % getTotalRowCount();
-        System.out.println("skjer det no her i nextRow " + currentRow);
-        /*currentPosition = (currentPosition + 6);
-        if (currentPosition > symbols.length) {
-            currentPosition = 0;
-        }*/
     }
 
     /**
      * Moving cursor to the next column.
      */
     public void nextColumn() {
-
         currentColumn = (currentColumn + 1) % getCurrentRowLength();
-        System.out.println("Skjer det noe her i nextColumn: " + currentColumn);
-        /*currentPosition = (currentPosition + 1);
-        if (currentPosition % 6 == 0) {
-            currentPosition -= 6;
-        } else if ((getCurrentSymbol().equals(Symbol.DICTIONARY)) || (getCurrentSymbol().equals(Symbol.MENU))) {
-
-            if (currentPosition % 3 == 0) {
-                currentPosition -= 3;
-            }
-        } */
     }
 
     /**
@@ -347,7 +313,6 @@ public class ETOSLayout extends StepLayout implements LayoutWithSuggestions {
 
     private void selectCurrentSymbol() {
         Symbol current = symbols[currentRow * ROW_LENGTH + currentColumn];
-        //Symbol current = symbols[currentPosition];
 
         if (current == Symbol.SEND) {
             keyboard.sendCurrentBuffer();
