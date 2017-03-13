@@ -40,13 +40,11 @@ public abstract class ListSorter {
                 comparator.add(new Comparator<DictionaryEntry>() {
                     @Override
                     public int compare(DictionaryEntry o1, DictionaryEntry o2) {
-                        return Integer.compare(o2.getUserFrequency(), o1.getUserFrequency());
-                    }
-                });
-                comparator.add(new Comparator<DictionaryEntry>() {
-                    @Override
-                    public int compare(DictionaryEntry o1, DictionaryEntry o2) {
-                        return Integer.compare(o2.getStandardFrequency(), o1.getStandardFrequency());
+                        int cmp = Integer.compare(o2.getUserFrequency(), o1.getUserFrequency());
+                        if(cmp == 0) {
+                            cmp = Integer.compare(o2.getStandardFrequency(), o1.getStandardFrequency());
+                        }
+                        return cmp;
                     }
                 });
 
@@ -59,13 +57,11 @@ public abstract class ListSorter {
                 comparator.add(new Comparator<DictionaryEntry>() {
                     @Override
                     public int compare(DictionaryEntry o1, DictionaryEntry o2) {
-                        return Integer.compare(o1.getUserFrequency(), o2.getUserFrequency());
-                    }
-                });
-                comparator.add(new Comparator<DictionaryEntry>() {
-                    @Override
-                    public int compare(DictionaryEntry o1, DictionaryEntry o2) {
-                        return Integer.compare(o1.getStandardFrequency(), o1.getStandardFrequency());
+                        int cmp = Integer.compare(o1.getUserFrequency(), o2.getUserFrequency());
+                        if (cmp == 0) {
+                            cmp = Integer.compare(o1.getStandardFrequency(), o2.getStandardFrequency());
+                        }
+                        return cmp;
                     }
                 });
                         /*ComparisonChain.start()
