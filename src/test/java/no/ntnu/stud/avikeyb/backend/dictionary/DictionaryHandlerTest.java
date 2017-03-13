@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -138,6 +139,101 @@ public class DictionaryHandlerTest {
         dictionaryHandlerNoFrequency.addWordToDictionary("zzzbkldiutgudzxkeudz", 0, 1);
         assertEquals(expectedOutputs, dictionaryHandlerNoFrequency.getSuggestionsStartingWith("zzzbkldiutgudzxkeud").subList(0, 1));
     }
+
+
+    @Test
+    public void testMostUsedEntries() {
+
+        List<DictionaryEntry> entries = new ArrayList<>(Arrays.asList(
+                de("a", 1),
+                de("b", 5),
+                de("c", 3),
+                de("d", 10),
+                de("e", 3),
+                de("f", 5),
+                de("g", 23),
+                de("h", 1)
+        ));
+
+        Dictionary dict = new DictionaryHandler(entries, 5);
+
+        List<String> res = dict.getSuggestionsStartingWith("");
+        List<String> exp = Arrays.asList("g", "d", "b", "f", "c");
+        assertEquals(exp, res);
+
+        dict.updateWordUsage("e");
+        res = dict.getSuggestionsStartingWith("");
+        exp = Arrays.asList("e", "g", "d", "b", "f");
+        assertEquals(exp, res);
+
+        dict.updateWordUsage("b");
+        res = dict.getSuggestionsStartingWith("");
+        exp = Arrays.asList("b", "e", "g", "d", "f");
+        assertEquals(exp, res);
+    }
+
+    @Test
+    public void testMostUsedEntriesAddingNew() {
+
+        List<DictionaryEntry> entries = new ArrayList<>(Arrays.asList(
+                de("a", 1),
+                de("b", 5),
+                de("c", 10)
+        ));
+
+        Dictionary dict = new DictionaryHandler(entries, 5);
+
+        List<String> res = dict.getSuggestionsStartingWith("");
+        List<String> exp = Arrays.asList("c", "b", "a");
+        assertEquals(exp, res);
+
+        dict.updateWordUsage("e");
+        res = dict.getSuggestionsStartingWith("");
+        exp = Arrays.asList("e", "c", "b", "a");
+        assertEquals(exp, res);
+
+        dict.updateWordUsage("f");
+        res = dict.getSuggestionsStartingWith("");
+        exp = Arrays.asList("e", "f", "c", "b", "a");
+        assertEquals(exp, res);
+
+        dict.updateWordUsage("g");
+        res = dict.getSuggestionsStartingWith("");
+        exp = Arrays.asList("e", "f", "g", "c", "b");
+        assertEquals(exp, res);
+
+        dict.updateWordUsage("h");
+        res = dict.getSuggestionsStartingWith("");
+        exp = Arrays.asList("e", "f", "g", "h", "c");
+        assertEquals(exp, res);
+
+        dict.updateWordUsage("c");
+        res = dict.getSuggestionsStartingWith("");
+        exp = Arrays.asList("c", "e", "f", "g", "h");
+        assertEquals(exp, res);
+
+        dict.updateWordUsage("c");
+        res = dict.getSuggestionsStartingWith("");
+        exp = Arrays.asList("c", "e", "f", "g", "h");
+        assertEquals(exp, res);
+
+        dict.updateWordUsage("f");
+        res = dict.getSuggestionsStartingWith("");
+        exp = Arrays.asList("c", "f", "e", "g", "h");
+        assertEquals(exp, res);
+
+        dict.updateWordUsage("f");
+        res = dict.getSuggestionsStartingWith("");
+        exp = Arrays.asList("f", "c", "e", "g", "h");
+        assertEquals(exp, res);
+    }
+
+
+
+    private DictionaryEntry de(String word, int frequency) {
+        return new DictionaryEntry(word, frequency, 0);
+    }
+    
 
 //    @Test
 //    public void standardizeDictionary() {
