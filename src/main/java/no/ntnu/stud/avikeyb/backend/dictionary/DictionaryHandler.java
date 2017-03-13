@@ -12,6 +12,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
     private List<DictionaryEntry> dictionary;
     private PriorityQueue<DictionaryEntry> mostUsedWords;
     private Map<String, DictionaryEntry> dictionaryEntryLookup; // used to speed up frequency updates
+    private final int mostUsedWordsLimit;
 
     /**
      * Constructs a dictionary handler with an empty dictionary.
@@ -27,9 +28,20 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
      * @param dictionary
      */
     public DictionaryHandler(List<DictionaryEntry> dictionary) {
+        this(dictionary, 20);
+    }
+
+    /**
+     * Constructs the dictionary handler.
+     * Automatically sorts the dictionary alphabetically.
+     *
+     * @param dictionary
+     */
+    public DictionaryHandler(List<DictionaryEntry> dictionary, int mostUsedWordsLimit) {
         this.dictionary = dictionary;
-        this.mostUsedWords = new PriorityQueue<>(21, dictionaryEntryComparatorLeastUsedFirst());
+        this.mostUsedWords = new PriorityQueue<>(mostUsedWordsLimit + 1, dictionaryEntryComparatorLeastUsedFirst());
         this.dictionaryEntryLookup = new HashMap<>();
+        this.mostUsedWordsLimit = mostUsedWordsLimit;
         updateMostUsedWords(dictionary);
         updateEntryLookup(dictionary);
         sortDictionary();
@@ -287,7 +299,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
 
         // Because the standard java priority queue can not be capped to a specific size we have to do it manually
         // Keep only the 20 most used words
-        if(mostUsedWords.size() >= 20) {
+        if(mostUsedWords.size() >= mostUsedWordsLimit) {
 
             int cmp = mostUsedWords.comparator().compare(leastEntry, entry);
 
