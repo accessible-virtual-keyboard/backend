@@ -213,6 +213,8 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
     @Override
     public void setDictionary(List<DictionaryEntry> dictionary) {
         this.dictionary = dictionary;
+        dictionaryEntryLookup.clear();
+        mostUsedWords.clear();
         updateMostUsedWords(dictionary);
         updateEntryLookup(dictionary);
         sortDictionary();
