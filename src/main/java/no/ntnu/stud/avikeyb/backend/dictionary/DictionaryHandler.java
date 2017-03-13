@@ -255,6 +255,9 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
                 int cmp = Integer.compare(d2.getUserFrequency(), d1.getUserFrequency());
                 if(cmp == 0){
                     cmp = Integer.compare(d2.getStandardFrequency(), d1.getStandardFrequency());
+                    if(cmp == 0){
+                        cmp = d1.getWord().compareToIgnoreCase(d2.getWord());
+                    }
                 }
                 return cmp;
             }
