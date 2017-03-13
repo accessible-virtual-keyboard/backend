@@ -150,12 +150,10 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
     public int addWordToDictionary(String word, int standardFrequency, int userFrequency) {
 
         // First check if word already exists.
-        for (DictionaryEntry dictionaryEntry : this.dictionary) {
-            if (dictionaryEntry.getWord().equals(word)) {
-                // Entry already exists.
-                return -1;
-            }
+        if(dictionaryEntryLookup.containsKey(word.toLowerCase())){
+            return -1;
         }
+
         DictionaryEntry entry = new DictionaryEntry(word, standardFrequency, userFrequency);
         dictionary.add(entry);
         updateMostUsedWords(entry);
