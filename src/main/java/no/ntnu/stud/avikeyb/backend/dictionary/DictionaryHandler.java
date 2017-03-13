@@ -294,9 +294,10 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
             int cmp = mostUsedWords.comparator().compare(leastEntry, entry);
 
             if (cmp < 0) {
-                // This new entry is larger than the current least entry so we remove the least entry
-                // and add the new
-                mostUsedWords.poll();
+                // Remove the entry if it is already in the queue, else we remove the least element before adding the new
+                if(!mostUsedWords.remove(entry)){
+                    mostUsedWords.poll();
+                }
                 mostUsedWords.add(entry);
             }
         }else {
