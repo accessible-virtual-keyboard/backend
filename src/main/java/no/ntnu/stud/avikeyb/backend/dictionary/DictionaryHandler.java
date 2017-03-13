@@ -214,6 +214,7 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
     public void setDictionary(List<DictionaryEntry> dictionary) {
         this.dictionary = dictionary;
         updateMostUsedWords(dictionary);
+        updateEntryLookup(dictionary);
         sortDictionary();
     }
 
