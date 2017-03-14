@@ -50,6 +50,7 @@ public enum Symbol {
     COMMA(","),
     SPACE(" "),
     SPACE_UNICODE_SYMBOL("\u005F"),
+    SPECIAL_CHARACTERS("Special"),
 
     NULL(null),
 
@@ -79,6 +80,9 @@ public enum Symbol {
     OPTION1("Option 1"),
     OPTION2("Option 2"),
     OPTION3("Option 3");
+
+    /*A1(""),*/
+
 
     private String content;
 
