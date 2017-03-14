@@ -223,7 +223,15 @@ public class AdaptiveLayout extends StepLayout implements LayoutWithSuggestions 
                 currentSuggestion++;
                 currentState = State.SUGGESTION_SELECTION;
             }
-        } else {
+        } else if(current == Symbol.CORRECT_WORD){
+            keyboard.deleteLastCharacter();
+            reset();
+            //TODO consider remaining in position instead of returning to start
+        } else if(current == Symbol.DELETE_WORD){
+            keyboard.deleteLastWord();
+            reset();
+            //TODO consider remaining in position instead of returning to start
+        }else {
             keyboard.addToCurrentBuffer(current.getContent());
             reset();
         }

@@ -227,7 +227,15 @@ public class ETOSLayout extends StepLayout implements LayoutWithSuggestions {
                         } else if (getCurrentSymbol().equals(Symbol.MENU)) {
                             currentMenuPosition++;
                             state = State.SELECT_MENU;
-                        } else {
+                        } else if(getCurrentSymbol().equals((Symbol.CORRECT_WORD))){
+                            keyboard.deleteLastCharacter();
+                            reset();
+                            //TODO consider remaining in position instead of returning to start
+                        } else if(getCurrentSymbol().equals((Symbol.DELETE_WORD))){
+                            keyboard.deleteLastWord();
+                            reset();
+                            //TODO consider remaining in position instead of returning to start
+                        } else{
                             selectCurrentSymbol();
                             reset();
                         }
