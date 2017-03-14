@@ -72,7 +72,7 @@ public enum Symbol {
 
     DICTIONARY("Dictionary"),
     DICTIONARY_UNICODE_SYMBOL("\uD83D\uDCD6"), //Draft
-    DICTIONARY_TOGGLE("Toggle Dictionary"),
+    MODE_TOGGLE("Toggle Mode"),
     DICTIONARY_TOGGLE_ON("\uD83D\uDCD6 \u2611"),
     DICTIONARY_TOGGLE_OFF("\uD83D\uDCD6 \u2610"),
     DICTIONARY_ADD_WORD("Add New Word"),

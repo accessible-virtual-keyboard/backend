@@ -16,8 +16,4 @@ public class MobileDictionaryLayoutTest extends LayoutTestBase {
         return new MobileDictionaryLayout(keyboard, new LinearEliminationDictionaryHandler());
     }
 
-/*    @Test
-    private void testDictionary(){
-
-    }*/
 }

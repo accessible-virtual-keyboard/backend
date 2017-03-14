@@ -2,7 +2,6 @@ package no.ntnu.stud.avikeyb.backend.layouts;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,20 +19,12 @@ import no.ntnu.stud.avikeyb.backend.dictionary.LinearEliminationDictionaryHandle
 
 public class MobileDictionaryLayout extends StepLayout {
 
-/*    public interface MobileLayoutSwap {
-        public void onStart();
-
-        public void onDictionaryOn();
-
-        public void onDictionaryOff();
-    }*/
-
     private int[] stepIndices;
     private Symbol[] symbols;
     private Keyboard keyboard;
 
     private State state = State.SELECT_ROW;
-    private DictionaryState dictionaryState = DictionaryState.DICTIONARY_ON;
+    private Mode mode = Mode.DICTIONARY_ON;
 
     private ArrayList<Symbol> markedSymbols = new ArrayList<>();
     private int[] location = new int[]{-1, -1, -1, -1};
@@ -50,7 +41,7 @@ public class MobileDictionaryLayout extends StepLayout {
         SELECT_DICTIONARY
     }
 
-    public enum DictionaryState {
+    public enum Mode {
         DICTIONARY_ON,
         DICTIONARY_OFF
     }
@@ -67,8 +58,16 @@ public class MobileDictionaryLayout extends StepLayout {
         nextRow();
     }
 
+    /**
+     * Updates the layout structures if dictionary is on or off.
+     * <p>
+     * Note: Do not change layout structure without updating onStep logic accordingly.
+     * Updating is needed if functionality symbols (any symbol not written with a single letter) are placed in another
+     * row in the symbols array in this method.
+     * </p>
+     */
     private void updateLayoutStructure() {
-        switch (dictionaryState) {
+        switch (mode) {
             case DICTIONARY_ON:
                 symbols = new Symbol[]{
                         Symbol.E, Symbol.T, Symbol.A,
@@ -81,7 +80,7 @@ public class MobileDictionaryLayout extends StepLayout {
 
                         Symbol.M, Symbol.F, Symbol.P, Symbol.G,
                         Symbol.K, Symbol.X, Symbol.J, Symbol.Q, Symbol.Z,
-                        Symbol.DICTIONARY_ADD_WORD, Symbol.DICTIONARY_TOGGLE,
+                        Symbol.MODE_TOGGLE,
 
                         Symbol.DICTIONARY,
                         Symbol.PERIOD, Symbol.COMMA, Symbol.QUESTION_MARK, Symbol.EXCLAMATION_MARK,
@@ -90,9 +89,8 @@ public class MobileDictionaryLayout extends StepLayout {
                 stepIndices = new int[]{
                         0, 3, 6, 9,
                         12, 16, 20,
-                        24, 29, 31,
-                        32, 36, 37};
-
+                        24, 29, 30,
+                        31, 35, 36};
                 break;
             case DICTIONARY_OFF:
                 symbols = new Symbol[]{
@@ -106,7 +104,7 @@ public class MobileDictionaryLayout extends StepLayout {
 
                         Symbol.H, Symbol.U, Symbol.G, Symbol.V,
                         Symbol.F, Symbol.Y, Symbol.X, Symbol.Q, Symbol.Z,
-                        Symbol.DICTIONARY_ADD_WORD, Symbol.DICTIONARY_TOGGLE,
+                        Symbol.MODE_TOGGLE,
 
                         Symbol.DICTIONARY,
                         Symbol.PERIOD, Symbol.COMMA, Symbol.QUESTION_MARK, Symbol.EXCLAMATION_MARK,
@@ -115,8 +113,8 @@ public class MobileDictionaryLayout extends StepLayout {
                 stepIndices = new int[]{
                         0, 4, 7, 10,
                         13, 17, 21,
-                        25, 30, 32,
-                        33, 37, 38};
+                        25, 30, 31,
+                        32, 36, 37};
                 break;
         }
 
@@ -126,170 +124,204 @@ public class MobileDictionaryLayout extends StepLayout {
     protected void onStep(InputType input) {
         switch (state) {
             case SELECT_ROW:
-                switch (input) {
-                    case INPUT1: //Move
-                        nextRow();
-                        break;
-                    case INPUT2: //Select
-                        changeStateColumnSelection();
-                        break;
-                }
+                onStepRowMode(input);
                 break;
             case SELECT_COLUMN:
-                switch (input) {
-                    case INPUT1:
-                        nextColumn();
-                        break;
-                    case INPUT2:
-                        state = State.SELECT_ROW;
-                        if (markedSymbols.contains(Symbol.SEND)) {
-                            keyboard.sendCurrentBuffer();
-                            dictionary.reset();
-                            setBaseSuggestions();
-                            reset();
-                            break;
-                        } else if (markedSymbols.contains(Symbol.DICTIONARY)) {
-                            changeStateDictionarySelection();
-                            break;
-                        } else if (markedSymbols.contains(Symbol.DELETE_WORD)) {
-                            if (dictionary.hasWordHistory() || !keyboard.getCurrentBuffer().isEmpty()) { // We don't want the user to input punctuation symbols when no words has been entered
-                                changeStateLetterSelection();
-                                break;
-                            }
-                        } else if (markedSymbols.contains(Symbol.PERIOD)) {
-                            if (!keyboard.getCurrentBuffer().isEmpty()) { // We don't want the user to input punctuation symbols when no words has been entered
-                                changeStateLetterSelection();
-                                break;
-                            }
-                        } else if (markedSymbols.contains(Symbol.DICTIONARY_TOGGLE)) {
-                            changeStateLetterSelection();
-                            break;
-                        } else if (dictionaryState == DictionaryState.DICTIONARY_ON) {
-                            dictionary.findValidSuggestions(getStringsFromMarkedSymbols());
-                            setSuggestions(dictionary.getSuggestions(nSuggestions));
-                            //TODO add marked symbols to the list at the left in the layout as a history feature
-                            reset();
-                            break;
-                        } else if (dictionaryState == DictionaryState.DICTIONARY_OFF) {
-                            changeStateLetterSelection();
-                            //TODO suggestion logic when dictionary is off
-                            break;
-                        }
-
-                        //logMarked();
-                }
+                onStepColumnMode(input);
                 break;
-
             case SELECT_LETTER:
-                switch (input) {
-                    case INPUT1:
-                        nextLetter();
-                        break;
-                    case INPUT2:
-
-                        if (markedSymbols.contains(Symbol.DELETE_WORD)) {
-                            if (!keyboard.getCurrentBuffer().isEmpty()) {
-                                deleteLastWord();
-                                dictionary.previousWord();
-                                setBaseSuggestions();
-                            }
-                        } else if (markedSymbols.contains(Symbol.CORRECT_WORD)) {
-                            //TODO add logic to handle proper word correction regardless of the dictionary state
-                            //Log.d(TAG, "onStep: -----------------------------------------");
-                            if (dictionary.hasWordHistory()) {
-                                //Log.d(TAG, "onStep: has history");
-                                dictionary.removeLastWordHistoryElement();
-                                if (!dictionary.hasWordHistory()) {
-                                    setBaseSuggestions();
-                                } else {
-                                    setCurrentSuggestions();
-                                }
-                            } else if (!(dictionary.hasWordHistory() && keyboard.getCurrentBuffer().isEmpty())) {
-                                //Log.d(TAG, "onStep: has no history");
-                                if (dictionaryState == DictionaryState.DICTIONARY_ON) {
-                                    deleteLastWord();
-                                } else if (dictionaryState == DictionaryState.DICTIONARY_OFF) {
-                                    removeLastLetter();
-                                }
-
-
-                                dictionary.previousWord();
-                                if (!dictionary.hasWordHistory() && keyboard.getCurrentBuffer().isEmpty()) {
-                                    setBaseSuggestions();
-                                } else {
-                                    setCurrentSuggestions();
-                                }
-
-                            }
-                        } else if (markedSymbols.contains(Symbol.DELETION_DONE)) {
-                            state = State.SELECT_ROW;
-                            reset();
-                            break;
-                        } else if (markedSymbols.contains(Symbol.DICTIONARY_TOGGLE)) {
-                            if (dictionaryState == DictionaryState.DICTIONARY_ON) {
-                                dictionaryState = DictionaryState.DICTIONARY_OFF;
-                            } else if (dictionaryState == DictionaryState.DICTIONARY_OFF) {
-                                dictionaryState = DictionaryState.DICTIONARY_ON;
-                            }
-                            dictionary.clearWordHistory();
-                            setBaseSuggestions();
-                            updateLayoutStructure();
-                            changeStateRowSelection();
-                            break;
-                        } else if (markedSymbols.contains(Symbol.DICTIONARY_ADD_WORD)) {
-                            //TODO implement add word to dictionary functionality
-                            changeStateRowSelection();
-                            break;
-
-                        } else if (markedSymbols.contains(Symbol.SPACE) || markedSymbols.contains(Symbol.PERIOD) || markedSymbols.contains(Symbol.COMMA) || markedSymbols.contains(Symbol.EXCLAMATION_MARK) || markedSymbols.contains(Symbol.QUESTION_MARK)) {
-                            //TODO make space start new word history
-                            dictionary.nextWord();
-                            setBaseSuggestions();
-                            writeSymbol();
-                            changeStateRowSelection();
-                            break;
-                        } else {
-                            if (dictionaryState == DictionaryState.DICTIONARY_OFF) {
-                                //TODO add possible suggestions to word history
-                                String marked = getMarkedSymbols().get(0).getContent();
-                                dictionary.findValidSuggestions(Collections.singletonList(marked));
-                                setCurrentSuggestions();
-                                selectCurrentSymbols();
-                            } else if (dictionaryState == DictionaryState.DICTIONARY_ON) {
-                                writeSymbol(); //Will never trigger
-                            }
-
-                            changeStateRowSelection();
-                            break;
-                        }
-
-                }
+                onStepLetterMode(input);
                 break;
-
             case SELECT_DICTIONARY:
-                switch (input) {
-                    case INPUT1:
-                        nextDictionaryRow();
-                        break;
-                    case INPUT2:
-                        //TODO check if dictionary state is on or off
-                        if (dictionaryState == DictionaryState.DICTIONARY_ON) {
-                            addWord();
-                        } else if (dictionaryState == DictionaryState.DICTIONARY_OFF) {
-                            addWordWithNoDictionary();
-                        }
+                onStepDictionaryMode(input);
+                break;
+        }
+        notifyLayoutListeners();
+    }
 
-                        setSuggestions(dictionary.getBaseSuggestion(nSuggestions));
-                        state = State.SELECT_ROW;
-                        reset();
-                        break;
+    private void onStepRowMode(InputType input) {
+        switch (input) {
+            case INPUT1: //Move
+                nextRow();
+                break;
+            case INPUT2: //Select
+                changeStateColumnSelection();
+                break;
+        }
+    }
+
+    private void onStepColumnMode(InputType input) {
+        switch (input) {
+            case INPUT1:
+                nextColumn();
+                break;
+            case INPUT2:
+                state = State.SELECT_ROW;
+                if (markedSymbols.contains(Symbol.SEND)) {
+                    send();
+                } else if (markedSymbols.contains(Symbol.DICTIONARY)) {
+                    changeStateDictionarySelection();
+                } else if (markedSymbols.contains(Symbol.DELETE_WORD)) {
+                    redirectDeletionFunctionality();
+                } else if (markedSymbols.contains(Symbol.PERIOD)) {
+                    redirectPunctuationFunctionality();
+                } else if (markedSymbols.contains(Symbol.MODE_TOGGLE)) {
+                    handleModeToggle();
+                } else if (mode == Mode.DICTIONARY_ON) {
+                    letterGroupPressed();
+                } else if (mode == Mode.DICTIONARY_OFF) {
+                    changeStateLetterSelection();
+                }
+                //logMarked();
+                break;
+        }
+    }
+
+    private void onStepLetterMode(InputType input) {
+        switch (input) {
+            case INPUT1:
+                nextLetter();
+                break;
+            case INPUT2:
+                if (markedSymbols.contains(Symbol.DELETE_WORD)) {
+                    handleWordDeletion();
+                } else if (markedSymbols.contains(Symbol.CORRECT_WORD)) {
+                    handleWordCorrection();
+                } else if (markedSymbols.contains(Symbol.DELETION_DONE)) {
+                    changeStateRowSelection();
+                } else if (markedSymbols.contains(Symbol.SPACE) || markedSymbols.contains(Symbol.PERIOD) || markedSymbols.contains(Symbol.COMMA) || markedSymbols.contains(Symbol.EXCLAMATION_MARK) || markedSymbols.contains(Symbol.QUESTION_MARK)) {
+                    handleWordSeparatingSymbols();
+                } else if (mode == Mode.DICTIONARY_OFF) {
+                    handleLetterSelected();
                 }
                 break;
         }
-
-        notifyLayoutListeners();
-
     }
+
+    private void onStepDictionaryMode(InputType input) {
+        switch (input) {
+            case INPUT1:
+                nextDictionaryRow();
+                break;
+            case INPUT2:
+                handleDictionaryWordSelection();
+                break;
+        }
+    }
+
+    private void handleDictionaryWordSelection() {
+        if (mode == Mode.DICTIONARY_ON) {
+            addWord();
+        } else if (mode == Mode.DICTIONARY_OFF) {
+            addWordWithNoDictionary();
+        }
+        setSuggestions(dictionary.getBaseSuggestion(nSuggestions));
+        state = State.SELECT_ROW;
+        reset();
+    }
+
+    /**
+     * Deletion functionality should be handled in the SELECT_LETTER state, so the state changes to that if there is
+     * something that can be deleted available (word history or keyboard buffer).
+     */
+    private void redirectDeletionFunctionality() {
+        if (dictionary.hasWordHistory() || !keyboard.getCurrentBuffer().isEmpty()) { // We don't want the user to input punctuation symbols when no words has been entered
+            changeStateLetterSelection();
+        }
+    }
+
+    /**
+     * Punctuation logic should be handled in the SELECT_LETTER state, so the state changes to that if there is
+     * something written in the keyboard buffer.
+     */
+    private void redirectPunctuationFunctionality() {
+        if (!keyboard.getCurrentBuffer().isEmpty()) { // We don't want the user to input punctuation symbols when no words has been entered
+            changeStateLetterSelection();
+        }
+    }
+
+    /**
+     * Sends the keyboard buffer and reverts to default state
+     */
+    private void send() {
+        keyboard.sendCurrentBuffer();
+        dictionary.reset();
+        setBaseSuggestions();
+        reset();
+    }
+
+
+    private void letterGroupPressed() {
+        dictionary.findValidSuggestions(getStringsFromMarkedSymbols());
+        setSuggestions(dictionary.getSuggestions(nSuggestions));
+        reset();
+    }
+
+    private void handleWordDeletion() {
+        if (!keyboard.getCurrentBuffer().isEmpty()) {
+            deleteLastWord();
+            dictionary.previousWord();
+            setBaseSuggestions();
+        }
+    }
+
+    private void handleWordCorrection() {
+        //TODO add logic to handle proper word correction regardless of the dictionary state
+        //Log.d(TAG, "onStep: -----------------------------------------");
+        if (dictionary.hasWordHistory()) {
+            //Log.d(TAG, "onStep: has history");
+            dictionary.removeLastWordHistoryElement();
+            if (!dictionary.hasWordHistory()) {
+                setBaseSuggestions();
+            } else {
+                setCurrentSuggestions();
+            }
+        } else if (!(dictionary.hasWordHistory() && keyboard.getCurrentBuffer().isEmpty())) {
+            //Log.d(TAG, "onStep: has no history");
+            if (mode == Mode.DICTIONARY_ON) {
+                deleteLastWord();
+            } else if (mode == Mode.DICTIONARY_OFF) {
+                removeLastLetter();
+            }
+
+
+            dictionary.previousWord();
+            if (!dictionary.hasWordHistory() && keyboard.getCurrentBuffer().isEmpty()) {
+                setBaseSuggestions();
+            } else {
+                setCurrentSuggestions();
+            }
+
+        }
+    }
+
+    private void handleModeToggle() {
+        if (mode == Mode.DICTIONARY_ON) {
+            mode = Mode.DICTIONARY_OFF;
+        } else if (mode == Mode.DICTIONARY_OFF) {
+            mode = Mode.DICTIONARY_ON;
+        }
+        dictionary.clearWordHistory();
+        setBaseSuggestions();
+        updateLayoutStructure();
+        changeStateRowSelection();
+    }
+
+    private void handleWordSeparatingSymbols() {
+        dictionary.nextWord();
+        setBaseSuggestions();
+        writeSymbol();
+        changeStateRowSelection();
+    }
+
+    private void handleLetterSelected() {
+        String marked = getMarkedSymbols().get(0).getContent();
+        dictionary.findValidSuggestions(Collections.singletonList(marked));
+        setCurrentSuggestions();
+        selectCurrentSymbols();
+        changeStateRowSelection();
+    }
+
 
     private void changeStateRowSelection() {
         state = State.SELECT_ROW;
@@ -312,8 +344,8 @@ public class MobileDictionaryLayout extends StepLayout {
         nextDictionaryRow();
     }
 
-    public DictionaryState getDictionaryState() {
-        return dictionaryState;
+    public Mode getMode() {
+        return mode;
     }
 
     /**
@@ -545,7 +577,7 @@ public class MobileDictionaryLayout extends StepLayout {
         }
     }
 
-    public List<String> getHistory(){
+    public List<String> getHistory() {
         return dictionary.getHistory();
     }
 
