@@ -15,12 +15,21 @@ import java.util.List;
 
 public class ETOSLayout extends StepLayout implements LayoutWithSuggestions {
 
-    private static Symbol[] symbols = Symbols.merge(
+    /*private static Symbol[] symbols = Symbols.merge(
             Symbols.build(Symbol.SEND),
             Symbols.etos(),
             Symbols.numbers(),
             Symbols.commonPunctuations()
-    );
+    );*/
+
+    private static Symbol[] symbols = {
+            Symbol.SPACE, Symbol.E, Symbol.A, Symbol.N, Symbol.L, Symbol.F,
+            Symbol.T, Symbol.O, Symbol.S, Symbol.D, Symbol.P, Symbol.B,
+            Symbol.I, Symbol.R, Symbol.C, Symbol.G, Symbol.V, Symbol.J,
+            Symbol.H, Symbol.U, Symbol.W, Symbol.K, Symbol.Q, Symbol.QUESTION_MARK,
+            Symbol.M, Symbol.Y, Symbol.X, Symbol.Z, Symbol.COMMA, Symbol.EXCLAMATION_MARK,
+            Symbol.DICTIONARY, Symbol.CORRECT_WORD, Symbol.DELETE_WORD, Symbol.PERIOD, Symbol.SPECIAL_CHARACTERS, Symbol.SEND
+    };
 
     private static Symbol[] menu = Symbols.menuOptions();
 
