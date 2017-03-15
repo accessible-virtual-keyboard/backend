@@ -170,7 +170,14 @@ public class BinarySearchLayout extends StepLayout implements LayoutWithSuggesti
     private void selectSymbol(Symbol symbol) {
         if (symbol == Symbol.SEND) {
             keyboard.sendCurrentBuffer();
-        }else if(symbol == Symbol.BACKSPACE){
+        }
+        else if((symbol == Symbol.DELETE_WORD || symbol == Symbol.BACKSPACE) && keyboard.getCurrentBuffer().isEmpty()){
+            // Corner case where the keyboard buffer will not change because it is already empty, so we need to reset and
+            // notify the listeners to update the ui if the user clicks one of the delete buttons when the buffer is empty.
+            reset();
+            notifyLayoutListeners();
+        }
+        else if(symbol == Symbol.BACKSPACE){
             keyboard.deleteLastCharacter();
         }
         else if(symbol == Symbol.DELETE_WORD){
