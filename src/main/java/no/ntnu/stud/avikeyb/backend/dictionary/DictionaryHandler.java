@@ -210,7 +210,8 @@ public class DictionaryHandler implements Dictionary, InMemoryDictionary {
 
     @Override
     public void updateWordUsage(String string) {
-        if (dictionaryEntryLookup.containsKey(string.toLowerCase())) {
+        string = string.toLowerCase();
+        if (dictionaryEntryLookup.containsKey(string)) {
             DictionaryEntry entry = dictionaryEntryLookup.get(string);
             entry.setUserFrequency(entry.getUserFrequency() + 1);
             updateMostUsedWords(entry);

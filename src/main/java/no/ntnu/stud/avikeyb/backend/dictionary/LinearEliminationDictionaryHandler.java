@@ -26,13 +26,13 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
      * suggestion list if the specified index matches a letter in the list. Thus the new suggestion
      * list is much smaller than the previous one.
      */
-    public void findValidSuggestions(List<String> lettersToFindAtIndex) {
+    public void findValidSuggestions(List<String> lettersToFindAtIndex, boolean nextWordOnEmptySearch) {
         isWordHistoryInitialized();
 
         List<DictionaryEntry> reducedSuggestionList;
         reducedSuggestionList = reduceValidSuggestions(lettersToFindAtIndex, getLastSuggestions());
 
-        if(reducedSuggestionList.isEmpty()){
+        if(reducedSuggestionList.isEmpty() && nextWordOnEmptySearch){
             nextWord();
         }else{
             SearchEntry entry = new SearchEntry(reducedSuggestionList, lettersToFindAtIndex);
@@ -231,13 +231,10 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
     }
 
     public boolean hasWordHistory(){
-        //boolean result = wordHistory.size() > 1;
-        //Log.d(TAG, "hasWordHistory: boolean: " + result);
         return wordHistory.size() > 1;
     }
     public void removeLastWordHistoryElement(){
         wordHistory.remove(wordHistory.size()-1);
-        //Log.d(TAG, "removeLastWordHistoryElement: word history size: " + wordHistory.size() + ", sentence history size: " + sentenceHistory.size());
     }
 
     @Override
@@ -290,5 +287,13 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
         public List<String> getSearch() {
             return search;
         }
+    }
+
+    /**
+     * Gives the size of the word history list minus the default element at index zero
+     * @return
+     */
+    public int getWordHistorySize(){
+        return wordHistory.size()-1;
     }
 }

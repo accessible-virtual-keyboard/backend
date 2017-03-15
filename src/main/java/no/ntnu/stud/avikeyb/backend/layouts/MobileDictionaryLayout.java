@@ -252,38 +252,44 @@ public class MobileDictionaryLayout extends StepLayout {
 
 
     private void letterGroupPressed() {
-        dictionary.findValidSuggestions(getStringsFromMarkedSymbols());
+        dictionary.findValidSuggestions(getStringsFromMarkedSymbols(), true);
         setSuggestions(dictionary.getSuggestions(nSuggestions));
         reset();
     }
 
     private void handleWordDeletion() {
-        if (!keyboard.getCurrentBuffer().isEmpty()) {
-            deleteLastWord();
-            dictionary.previousWord();
+        if (!keyboard.getCurrentBuffer().isEmpty() || dictionary.hasWordHistory()) {
+            if(!dictionary.hasWordHistory()){
+                deleteLastWord();
+                dictionary.previousWord();
+            }else{
+                if(mode == Mode.DICTIONARY_OFF){
+                    deleteLastWord();
+                }
+            }
+            dictionary.clearWordHistory();
             setBaseSuggestions();
         }
     }
 
     private void handleWordCorrection() {
         //TODO add logic to handle proper word correction regardless of the dictionary state
-        //Log.d(TAG, "onStep: -----------------------------------------");
         if (dictionary.hasWordHistory()) {
-            //Log.d(TAG, "onStep: has history");
             dictionary.removeLastWordHistoryElement();
+            if(mode == Mode.DICTIONARY_OFF){
+                sliceWordToHistoryLength();
+            }
             if (!dictionary.hasWordHistory()) {
                 setBaseSuggestions();
             } else {
                 setCurrentSuggestions();
             }
         } else if (!(dictionary.hasWordHistory() && keyboard.getCurrentBuffer().isEmpty())) {
-            //Log.d(TAG, "onStep: has no history");
             if (mode == Mode.DICTIONARY_ON) {
                 deleteLastWord();
             } else if (mode == Mode.DICTIONARY_OFF) {
                 removeLastLetter();
             }
-
 
             dictionary.previousWord();
             if (!dictionary.hasWordHistory() && keyboard.getCurrentBuffer().isEmpty()) {
@@ -295,11 +301,34 @@ public class MobileDictionaryLayout extends StepLayout {
         }
     }
 
+    private void sliceWordToHistoryLength(){
+        int currentWordLength = keyboard.getCurrentWord().length();
+        int currentExpectedLength = dictionary.getWordHistorySize();
+        if(currentWordLength > currentExpectedLength){
+            int removals = currentWordLength - currentExpectedLength;
+            for (int i = 0; i < removals; i++) {
+                deleteLastCharacter();
+            }
+        }else if( currentExpectedLength > currentWordLength){
+            int removals = currentExpectedLength - currentWordLength;
+            for (int i = 0; i < removals; i++) {
+                dictionary.removeLastWordHistoryElement();
+            }
+        }
+    }
+
+    private void deleteLastCharacter() {
+        keyboard.deleteLastCharacter();
+    }
+
     private void handleModeToggle() {
         if (mode == Mode.DICTIONARY_ON) {
             mode = Mode.DICTIONARY_OFF;
         } else if (mode == Mode.DICTIONARY_OFF) {
             mode = Mode.DICTIONARY_ON;
+            if(dictionary.hasWordHistory()){
+                deleteLastWord();
+            }
         }
         dictionary.clearWordHistory();
         setBaseSuggestions();
@@ -316,7 +345,7 @@ public class MobileDictionaryLayout extends StepLayout {
 
     private void handleLetterSelected() {
         String marked = getMarkedSymbols().get(0).getContent();
-        dictionary.findValidSuggestions(Collections.singletonList(marked));
+        dictionary.findValidSuggestions(Collections.singletonList(marked), false);
         setCurrentSuggestions();
         selectCurrentSymbols();
         changeStateRowSelection();
@@ -339,9 +368,13 @@ public class MobileDictionaryLayout extends StepLayout {
     }
 
     private void changeStateDictionarySelection() {
-        state = State.SELECT_DICTIONARY;
-        softReset();
-        nextDictionaryRow();
+        if(!suggestions.isEmpty()) {
+            state = State.SELECT_DICTIONARY;
+            softReset();
+            nextDictionaryRow();
+        }else {
+            reset();
+        }
     }
 
     public Mode getMode() {
@@ -420,18 +453,8 @@ public class MobileDictionaryLayout extends StepLayout {
     }
 
     private void deleteLastWord() {
-        String currentBuffer = keyboard.getCurrentBuffer();
-        int secondLastSpace = currentBuffer.trim().lastIndexOf(" ");
-        if (secondLastSpace == -1) {
-            currentBuffer = "";
-        } else {
-            currentBuffer = currentBuffer.substring(0, secondLastSpace) + " ";
-        }
-
-        keyboard.clearCurrentBuffer();
-        keyboard.addToCurrentBuffer(currentBuffer);
+        keyboard.deleteLastWord();
     }
-
 
     private void addWord() {
         String currentText = keyboard.getCurrentBuffer();
