@@ -15,9 +15,10 @@ import java.util.List;
 public class BinarySearchLayout extends StepLayout implements LayoutWithSuggestions {
 
 
+    // Only used for letting the ui know all the symbols in the layout
     private static Symbol[] symbols = Symbols.merge(
             Symbols.alphabet(),
-            Symbols.build(Symbol.SPACE, Symbol.SEND, Symbol.BACKSPACE, Symbol.DELETE_WORD),
+            Symbols.build(Symbol.SPACE, Symbol.SEND, Symbol.BACKSPACE, Symbol.DELETE_WORD, Symbol.CLEAR_BUFFER),
             Symbols.numbers(),
             Symbols.commonPunctuations());
 
@@ -182,6 +183,9 @@ public class BinarySearchLayout extends StepLayout implements LayoutWithSuggesti
         }
         else if(symbol == Symbol.DELETE_WORD){
             keyboard.deleteLastWord();
+        }
+        else if(symbol == Symbol.CLEAR_BUFFER){
+            keyboard.clearCurrentBuffer();
         }
         else {
             keyboard.addToCurrentBuffer(symbol.getContent());

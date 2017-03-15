@@ -58,6 +58,7 @@ public enum Symbol {
     CORRECT_WORD("Fix Word"),
     DELETE_WORD("Delete Word"),
     DELETION_DONE("\u2713"),
+    CLEAR_BUFFER("Clear Buffer"),
     SEND("\u2332"),
 
     SWITCH("Switch"),
