@@ -1,6 +1,7 @@
 package no.ntnu.stud.avikeyb.backend.dictionary;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -174,11 +175,19 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
      * @param n number of suggestions wanted
      * @return
      */
-    public List<String> getBaseSuggestion(int n){
+    public List<String> getDefaultSuggestion(int n){
         isWordHistoryInitialized();
+        List<DictionaryEntry> dictionaryEntryList;
+        List<String> resultList;
 
-        List<DictionaryEntry> dictionaryEntryList = fullDictionaryFrequencySorted.subList(0,n);
-        List<String> resultList = new ArrayList<>(n);
+        if(n > fullDictionaryFrequencySorted.size()){
+            dictionaryEntryList = fullDictionaryFrequencySorted;
+            resultList = new ArrayList<>(fullDictionaryFrequencySorted.size());
+        }else {
+            dictionaryEntryList = fullDictionaryFrequencySorted.subList(0,n);
+            resultList = new ArrayList<>(n);
+        }
+
         for (int i = 0; i < dictionaryEntryList.size(); i++) {
             DictionaryEntry de = dictionaryEntryList.get(i);
             resultList.add(de.getWord());
@@ -223,6 +232,11 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
         for (DictionaryEntry entry : list) {
             System.out.println(entry.getWord() + " - " + entry.getUserFrequency());
         }
+    }
+    public void addSpecialCharacterHistoryEntry(String specialCharacter){
+        clearWordHistory();
+        wordHistory.add(new SearchEntry(specialCharacter));
+        nextWord();
     }
 
     public void reset(){
@@ -271,13 +285,29 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
         return result;
     }
 
+    public boolean isCurrentHistoryEntrySpecial() {
+        if(wordHistory.size() == 2){
+            return wordHistory.get(1).isSpecial();
+        }
+        return false;
+    }
+
     private class SearchEntry{
         List<DictionaryEntry> searchResult;
         List<String> search;
+        Boolean special;
 
         public SearchEntry(List<DictionaryEntry> searchResult, List<String> search){
             this.searchResult = searchResult;
             this.search = search;
+            special = false;
+        }
+
+        public SearchEntry(String specialSymbol){
+            DictionaryEntry dEntry = new DictionaryEntry(specialSymbol,0,0);
+            searchResult = Collections.singletonList(dEntry);
+            search = Collections.singletonList(specialSymbol);
+            special = true;
         }
 
         public List<DictionaryEntry> getSearchResult() {
@@ -286,6 +316,10 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
 
         public List<String> getSearch() {
             return search;
+        }
+
+        public Boolean isSpecial() {
+            return special;
         }
     }
 

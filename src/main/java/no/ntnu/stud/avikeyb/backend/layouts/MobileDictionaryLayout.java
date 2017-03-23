@@ -8,6 +8,7 @@ import java.util.List;
 import no.ntnu.stud.avikeyb.backend.InputType;
 import no.ntnu.stud.avikeyb.backend.Keyboard;
 import no.ntnu.stud.avikeyb.backend.Symbol;
+import no.ntnu.stud.avikeyb.backend.dictionary.DictionaryEntry;
 import no.ntnu.stud.avikeyb.backend.dictionary.LinearEliminationDictionaryHandler;
 
 
@@ -54,7 +55,18 @@ public class MobileDictionaryLayout extends StepLayout {
 
         updateLayoutStructure();
         /*MobileLayoutSwap.onStart();*/
-        setBaseSuggestions();
+        setDefaultSuggestions();
+        nextRow();
+    }
+
+    public MobileDictionaryLayout(Keyboard keyboard, LinearEliminationDictionaryHandler dictionary, List<DictionaryEntry> entries) {
+        suggestions = new ArrayList<>();
+        this.keyboard = keyboard;
+        dictionary.setDictionary(entries);
+        this.dictionary = dictionary;
+        updateLayoutStructure();
+        /*MobileLayoutSwap.onStart();*/
+        setDefaultSuggestions();
         nextRow();
     }
 
@@ -164,7 +176,7 @@ public class MobileDictionaryLayout extends StepLayout {
                 } else if (markedSymbols.contains(Symbol.DELETE_WORD)) {
                     redirectDeletionFunctionality();
                 } else if (markedSymbols.contains(Symbol.PERIOD)) {
-                    redirectPunctuationFunctionality();
+                    changeStateLetterSelection();
                 } else if (markedSymbols.contains(Symbol.MODE_TOGGLE)) {
                     handleModeToggle();
                 } else if (mode == Mode.DICTIONARY_ON) {
@@ -215,7 +227,7 @@ public class MobileDictionaryLayout extends StepLayout {
         } else if (mode == Mode.DICTIONARY_OFF) {
             addWordWithNoDictionary();
         }
-        setSuggestions(dictionary.getBaseSuggestion(nSuggestions));
+        setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
         state = State.SELECT_ROW;
         reset();
     }
@@ -246,7 +258,7 @@ public class MobileDictionaryLayout extends StepLayout {
     private void send() {
         keyboard.sendCurrentBuffer();
         dictionary.reset();
-        setBaseSuggestions();
+        setDefaultSuggestions();
         reset();
     }
 
@@ -268,22 +280,29 @@ public class MobileDictionaryLayout extends StepLayout {
                 }
             }
             dictionary.clearWordHistory();
-            setBaseSuggestions();
+            setDefaultSuggestions();
         }
     }
 
     private void handleWordCorrection() {
         //TODO add logic to handle proper word correction regardless of the dictionary state
         if (dictionary.hasWordHistory()) {
-            dictionary.removeLastWordHistoryElement();
-            if(mode == Mode.DICTIONARY_OFF){
-                sliceWordToHistoryLength();
+            if(dictionary.isCurrentHistoryEntrySpecial()){
+                dictionary.clearWordHistory();
+
+            }else{
+                dictionary.removeLastWordHistoryElement();
+                if(mode == Mode.DICTIONARY_OFF){
+                    sliceWordToHistoryLength();
+                }
             }
+
             if (!dictionary.hasWordHistory()) {
-                setBaseSuggestions();
+                setDefaultSuggestions();
             } else {
                 setCurrentSuggestions();
             }
+
         } else if (!(dictionary.hasWordHistory() && keyboard.getCurrentBuffer().isEmpty())) {
             if (mode == Mode.DICTIONARY_ON) {
                 deleteLastWord();
@@ -293,7 +312,9 @@ public class MobileDictionaryLayout extends StepLayout {
 
             dictionary.previousWord();
             if (!dictionary.hasWordHistory() && keyboard.getCurrentBuffer().isEmpty()) {
-                setBaseSuggestions();
+                setDefaultSuggestions();
+            } else if (dictionary.isCurrentHistoryEntrySpecial()){
+                setDefaultSuggestions();
             } else {
                 setCurrentSuggestions();
             }
@@ -331,14 +352,15 @@ public class MobileDictionaryLayout extends StepLayout {
             }
         }
         dictionary.clearWordHistory();
-        setBaseSuggestions();
+        setDefaultSuggestions();
         updateLayoutStructure();
         changeStateRowSelection();
     }
 
     private void handleWordSeparatingSymbols() {
-        dictionary.nextWord();
-        setBaseSuggestions();
+        /*dictionary.nextWord();*/
+        dictionary.addSpecialCharacterHistoryEntry(getMarkedSymbols().get(0).getContent());
+        setDefaultSuggestions();
         writeSymbol();
         changeStateRowSelection();
     }
@@ -453,8 +475,18 @@ public class MobileDictionaryLayout extends StepLayout {
     }
 
     private void deleteLastWord() {
-        keyboard.deleteLastWord();
+        String currentWord = keyboard.getCurrentBuffer();
+        if(currentWord.matches("[a-zA-Z]+[!?.,][ ]")){
+            keyboard.deleteLastCharacter();
+            keyboard.deleteLastCharacter();
+            keyboard.addToCurrentBuffer(" ");
+        }else {
+            keyboard.deleteLastWord();
+        }
+
     }
+
+
 
     private void addWord() {
         String currentText = keyboard.getCurrentBuffer();
@@ -486,8 +518,8 @@ public class MobileDictionaryLayout extends StepLayout {
         }
     }
 
-    private void setBaseSuggestions() {
-        setSuggestions(dictionary.getBaseSuggestion(nSuggestions));
+    private void setDefaultSuggestions() {
+        setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
     }
 
     /**
@@ -643,6 +675,10 @@ public class MobileDictionaryLayout extends StepLayout {
 
     public int getMaxPossibleSuggestions() {
         return nSuggestions;
+    }
+
+    public void setDictionaryList(List<DictionaryEntry> list){
+        dictionary.setDictionary(list);
     }
 
 }
