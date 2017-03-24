@@ -18,7 +18,7 @@ import no.ntnu.stud.avikeyb.backend.dictionary.LinearEliminationDictionaryHandle
  * Created by Tor-Martin Holen on 21-Feb-17.
  */
 
-public class MobileDictionaryLayout extends StepLayout {
+public class MobileLayout extends StepLayout {
 
     private int[] stepIndices;
     private Symbol[] symbols;
@@ -48,7 +48,7 @@ public class MobileDictionaryLayout extends StepLayout {
     }
 
 
-    public MobileDictionaryLayout(Keyboard keyboard, LinearEliminationDictionaryHandler dictionary) {
+    public MobileLayout(Keyboard keyboard, LinearEliminationDictionaryHandler dictionary) {
         suggestions = new ArrayList<>();
         this.keyboard = keyboard;
         this.dictionary = dictionary;
@@ -59,7 +59,7 @@ public class MobileDictionaryLayout extends StepLayout {
         nextRow();
     }
 
-    public MobileDictionaryLayout(Keyboard keyboard, LinearEliminationDictionaryHandler dictionary, List<DictionaryEntry> entries) {
+    public MobileLayout(Keyboard keyboard, LinearEliminationDictionaryHandler dictionary, List<DictionaryEntry> entries) {
         suggestions = new ArrayList<>();
         this.keyboard = keyboard;
         dictionary.setDictionary(entries);
@@ -285,7 +285,6 @@ public class MobileDictionaryLayout extends StepLayout {
     }
 
     private void handleWordCorrection() {
-        //TODO add logic to handle proper word correction regardless of the dictionary state
         if (dictionary.hasWordHistory()) {
             dictionary.removeLastWordHistoryElement();
             if (mode == Mode.LETTER_SELECTION_MODE) {
