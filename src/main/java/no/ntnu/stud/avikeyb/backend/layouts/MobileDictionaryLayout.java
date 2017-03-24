@@ -25,7 +25,7 @@ public class MobileDictionaryLayout extends StepLayout {
     private Keyboard keyboard;
 
     private State state = State.SELECT_ROW;
-    private Mode mode = Mode.DICTIONARY_ON;
+    private Mode mode = Mode.TILE_SELECTION_MODE;
 
     private ArrayList<Symbol> markedSymbols = new ArrayList<>();
     private int[] location = new int[]{-1, -1, -1, -1};
@@ -43,8 +43,8 @@ public class MobileDictionaryLayout extends StepLayout {
     }
 
     public enum Mode {
-        DICTIONARY_ON,
-        DICTIONARY_OFF
+        TILE_SELECTION_MODE,
+        LETTER_SELECTION_MODE
     }
 
 
@@ -80,7 +80,7 @@ public class MobileDictionaryLayout extends StepLayout {
      */
     private void updateLayoutStructure() {
         switch (mode) {
-            case DICTIONARY_ON:
+            case TILE_SELECTION_MODE:
                 symbols = new Symbol[]{
                         Symbol.E, Symbol.T, Symbol.A,
                         Symbol.O, Symbol.I, Symbol.N,
@@ -104,7 +104,7 @@ public class MobileDictionaryLayout extends StepLayout {
                         24, 29, 30,
                         31, 35, 36};
                 break;
-            case DICTIONARY_OFF:
+            case LETTER_SELECTION_MODE:
                 symbols = new Symbol[]{
                         Symbol.E, Symbol.T, Symbol.I, Symbol.SPACE,
                         Symbol.A, Symbol.N, Symbol.L,
@@ -179,9 +179,9 @@ public class MobileDictionaryLayout extends StepLayout {
                     changeStateLetterSelection();
                 } else if (markedSymbols.contains(Symbol.MODE_TOGGLE)) {
                     handleModeToggle();
-                } else if (mode == Mode.DICTIONARY_ON) {
+                } else if (mode == Mode.TILE_SELECTION_MODE) {
                     letterGroupPressed();
-                } else if (mode == Mode.DICTIONARY_OFF) {
+                } else if (mode == Mode.LETTER_SELECTION_MODE) {
                     changeStateLetterSelection();
                 }
                 //logMarked();
@@ -203,7 +203,7 @@ public class MobileDictionaryLayout extends StepLayout {
                     changeStateRowSelection();
                 } else if (markedSymbols.contains(Symbol.SPACE) || markedSymbols.contains(Symbol.PERIOD) || markedSymbols.contains(Symbol.COMMA) || markedSymbols.contains(Symbol.EXCLAMATION_MARK) || markedSymbols.contains(Symbol.QUESTION_MARK)) {
                     handleWordSeparatingSymbols();
-                } else if (mode == Mode.DICTIONARY_OFF) {
+                } else if (mode == Mode.LETTER_SELECTION_MODE) {
                     handleLetterSelected();
                 }
                 break;
@@ -222,9 +222,9 @@ public class MobileDictionaryLayout extends StepLayout {
     }
 
     private void handleDictionaryWordSelection() {
-        if (mode == Mode.DICTIONARY_ON) {
+        if (mode == Mode.TILE_SELECTION_MODE) {
             addWord();
-        } else if (mode == Mode.DICTIONARY_OFF) {
+        } else if (mode == Mode.LETTER_SELECTION_MODE) {
             addWordWithNoDictionary();
         }
         setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
@@ -271,11 +271,11 @@ public class MobileDictionaryLayout extends StepLayout {
 
     private void handleWordDeletion() {
         if (!keyboard.getCurrentBuffer().isEmpty() || dictionary.hasWordHistory()) {
-            if(!dictionary.hasWordHistory()){
+            if (!dictionary.hasWordHistory()) {
                 deleteLastWord();
                 dictionary.previousWord();
-            }else{
-                if(mode == Mode.DICTIONARY_OFF){
+            } else {
+                if (mode == Mode.LETTER_SELECTION_MODE) {
                     deleteLastWord();
                 }
             }
@@ -287,16 +287,10 @@ public class MobileDictionaryLayout extends StepLayout {
     private void handleWordCorrection() {
         //TODO add logic to handle proper word correction regardless of the dictionary state
         if (dictionary.hasWordHistory()) {
-            if(dictionary.isCurrentHistoryEntrySpecial()){
-                dictionary.clearWordHistory();
-
-            }else{
-                dictionary.removeLastWordHistoryElement();
-                if(mode == Mode.DICTIONARY_OFF){
-                    sliceWordToHistoryLength();
-                }
+            dictionary.removeLastWordHistoryElement();
+            if (mode == Mode.LETTER_SELECTION_MODE) {
+                sliceWordToHistoryLength();
             }
-
             if (!dictionary.hasWordHistory()) {
                 setDefaultSuggestions();
             } else {
@@ -304,16 +298,15 @@ public class MobileDictionaryLayout extends StepLayout {
             }
 
         } else if (!(dictionary.hasWordHistory() && keyboard.getCurrentBuffer().isEmpty())) {
-            if (mode == Mode.DICTIONARY_ON) {
+            if (mode == Mode.TILE_SELECTION_MODE) {
                 deleteLastWord();
-            } else if (mode == Mode.DICTIONARY_OFF) {
+            } else if (mode == Mode.LETTER_SELECTION_MODE) {
                 removeLastLetter();
             }
 
             dictionary.previousWord();
-            if (!dictionary.hasWordHistory() && keyboard.getCurrentBuffer().isEmpty()) {
-                setDefaultSuggestions();
-            } else if (dictionary.isCurrentHistoryEntrySpecial()){
+            if (!dictionary.hasWordHistory() && keyboard.getCurrentBuffer().isEmpty() || dictionary.isCurrentHistoryEntrySpecial()) {
+                dictionary.clearWordHistory();
                 setDefaultSuggestions();
             } else {
                 setCurrentSuggestions();
@@ -322,15 +315,15 @@ public class MobileDictionaryLayout extends StepLayout {
         }
     }
 
-    private void sliceWordToHistoryLength(){
+    private void sliceWordToHistoryLength() {
         int currentWordLength = keyboard.getCurrentWord().length();
         int currentExpectedLength = dictionary.getWordHistorySize();
-        if(currentWordLength > currentExpectedLength){
+        if (currentWordLength > currentExpectedLength) {
             int removals = currentWordLength - currentExpectedLength;
             for (int i = 0; i < removals; i++) {
                 deleteLastCharacter();
             }
-        }else if( currentExpectedLength > currentWordLength){
+        } else if (currentExpectedLength > currentWordLength) {
             int removals = currentExpectedLength - currentWordLength;
             for (int i = 0; i < removals; i++) {
                 dictionary.removeLastWordHistoryElement();
@@ -343,11 +336,11 @@ public class MobileDictionaryLayout extends StepLayout {
     }
 
     private void handleModeToggle() {
-        if (mode == Mode.DICTIONARY_ON) {
-            mode = Mode.DICTIONARY_OFF;
-        } else if (mode == Mode.DICTIONARY_OFF) {
-            mode = Mode.DICTIONARY_ON;
-            if(dictionary.hasWordHistory()){
+        if (mode == Mode.TILE_SELECTION_MODE) {
+            mode = Mode.LETTER_SELECTION_MODE;
+        } else if (mode == Mode.LETTER_SELECTION_MODE) {
+            mode = Mode.TILE_SELECTION_MODE;
+            if (dictionary.hasWordHistory()) {
                 deleteLastWord();
             }
         }
@@ -390,11 +383,11 @@ public class MobileDictionaryLayout extends StepLayout {
     }
 
     private void changeStateDictionarySelection() {
-        if(!suggestions.isEmpty()) {
+        if (!suggestions.isEmpty()) {
             state = State.SELECT_DICTIONARY;
             softReset();
             nextDictionaryRow();
-        }else {
+        } else {
             reset();
         }
     }
@@ -476,16 +469,15 @@ public class MobileDictionaryLayout extends StepLayout {
 
     private void deleteLastWord() {
         String currentWord = keyboard.getCurrentBuffer();
-        if(currentWord.matches("[a-zA-Z]+[!?.,][ ]")){
+        if (currentWord.matches("[a-zA-Z]+[!?.,][ ]")) {
             keyboard.deleteLastCharacter();
             keyboard.deleteLastCharacter();
             keyboard.addToCurrentBuffer(" ");
-        }else {
+        } else {
             keyboard.deleteLastWord();
         }
 
     }
-
 
 
     private void addWord() {
@@ -677,7 +669,7 @@ public class MobileDictionaryLayout extends StepLayout {
         return nSuggestions;
     }
 
-    public void setDictionaryList(List<DictionaryEntry> list){
+    public void setDictionaryList(List<DictionaryEntry> list) {
         dictionary.setDictionary(list);
     }
 
