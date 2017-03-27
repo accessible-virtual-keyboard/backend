@@ -4,6 +4,7 @@ package no.ntnu.stud.avikeyb.backend.layouts;
 import no.ntnu.stud.avikeyb.backend.InputType;
 import no.ntnu.stud.avikeyb.backend.Keyboard;
 import no.ntnu.stud.avikeyb.backend.Symbol;
+import no.ntnu.stud.avikeyb.backend.core.BackendLogger;
 import no.ntnu.stud.avikeyb.backend.dictionary.DictionaryEntry;
 import no.ntnu.stud.avikeyb.backend.dictionary.LinearEliminationDictionaryHandler;
 
@@ -18,7 +19,7 @@ import java.util.List;
  * Created by Tor-Martin Holen on 21-Feb-17.
  */
 
-public class MobileLayout extends StepLayout {
+public class MobileLayout extends StepLayout implements LayoutWithSuggestions {
 
     private int[] stepIndices;
     private Symbol[] symbols;
@@ -52,6 +53,7 @@ public class MobileLayout extends StepLayout {
         suggestions = new ArrayList<>();
         this.keyboard = keyboard;
         this.dictionary = dictionary;
+
 
         updateLayoutStructure();
         /*MobileLayoutSwap.onStart();*/
@@ -261,9 +263,22 @@ public class MobileLayout extends StepLayout {
 
 
     private void letterGroupPressed() {
+        BackendLogger.log("BeforeSearch");
         dictionary.findValidSuggestions(getStringsFromMarkedSymbols(), true);
         setSuggestions(dictionary.getSuggestions(nSuggestions));
+        BackendLogger.log("TestAfterSearch");
         reset();
+
+
+    }
+
+    private void handleLetterSelected() {
+        String marked = getMarkedSymbols().get(0).getContent();
+        dictionary.findValidSuggestions(Collections.singletonList(marked), false);
+
+        setCurrentSuggestions();
+        selectCurrentSymbols();
+        changeStateRowSelection();
     }
 
     private void handleWordDeletion() {
@@ -380,20 +395,12 @@ public class MobileLayout extends StepLayout {
         changeStateRowSelection();
     }
 
+
     private void handleWordSeparatingSymbols() {
         /*dictionary.nextWord();*/
         dictionary.addSpecialCharacterHistoryEntry(getMarkedSymbols().get(0).getContent());
         setDefaultSuggestions();
         writeSymbol();
-        changeStateRowSelection();
-    }
-
-
-    private void handleLetterSelected() {
-        String marked = getMarkedSymbols().get(0).getContent();
-        dictionary.findValidSuggestions(Collections.singletonList(marked), false);
-        setCurrentSuggestions();
-        selectCurrentSymbols();
         changeStateRowSelection();
     }
 

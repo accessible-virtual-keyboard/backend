@@ -1,1 +1,1 @@
-mvnw install -DskipTests
+mvnw install -X -DskipTests

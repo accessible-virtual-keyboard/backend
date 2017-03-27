@@ -63,4 +63,10 @@ public class DictionaryEntry {
         this.userFrequency = userFrequency;
     }
 
+    @Override
+    public String toString() {
+        return "DictionaryEntry{" +
+                "word='" + word + '\'' +
+                '}';
+    }
 }

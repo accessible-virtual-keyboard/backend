@@ -1,8 +1,9 @@
 package no.ntnu.stud.avikeyb.backend.dictionary;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import no.ntnu.stud.avikeyb.backend.core.BackendLogger;
+import no.ntnu.stud.avikeyb.backend.core.Logger;
+
+import java.util.*;
 
 /**
  * Created by Tor-Martin Holen on 21-Feb-17.
@@ -15,11 +16,16 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
     private List<List<SearchEntry>> sentenceHistory; //Stores all the word histories until the sentence is sent.
     private List<SearchEntry> wordHistory; //List of suggestions given at different word lengths.
 
+    private HashMap<String, List<DictionaryEntry>> searchCache = new HashMap<>();
+
     /**
      * Constructs a dictionary
      */
     public LinearEliminationDictionaryHandler()  {
         sentenceHistory = new ArrayList<>();
+
+
+
     }
 
     /**
@@ -28,10 +34,14 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
      * list is much smaller than the previous one.
      */
     public void findValidSuggestions(List<String> lettersToFindAtIndex, boolean nextWordOnEmptySearch) {
-        isWordHistoryInitialized();
-
         List<DictionaryEntry> reducedSuggestionList;
-        reducedSuggestionList = reduceValidSuggestions(lettersToFindAtIndex, getLastSuggestions());
+
+        String letters = stringJoin(lettersToFindAtIndex);
+        if(searchCache.containsKey(letters) && !hasWordHistory()){
+            reducedSuggestionList = searchCache.get(letters);
+        }else {
+            reducedSuggestionList = reduceValidSuggestions(lettersToFindAtIndex, getLastSuggestions());
+        }
 
         if(reducedSuggestionList.isEmpty() && nextWordOnEmptySearch){
             nextWord();
@@ -40,6 +50,35 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
             wordHistory.add(entry);
         }
 
+    }
+
+    private List<DictionaryEntry> reduceValidSuggestions(List<String> lettersToFindAtIndex, List<DictionaryEntry> searchList){
+        List<DictionaryEntry> reducedSuggestionList = new ArrayList<>();
+        int searchIndex = findSearchIndex();
+        //Log.d("LinearElimination", "Original suggestions: " + searchList.size());
+        for (DictionaryEntry entry : searchList) {
+            if(entry.getWord().length() > searchIndex && lettersToFindAtIndex.contains(String.valueOf(entry.getWord().charAt(searchIndex)))){
+                reducedSuggestionList.add(entry);
+            }
+            /*for (int i = 0; i < lettersToFindAtIndex.size(); i++) {
+                String letter = lettersToFindAtIndex.get(i);
+                boolean contained = entry.getWord().substring(searchIndex).startsWith(letter); //TODO fix index out of bounds exception
+                if (contained) {
+                    reducedSuggestionList.add(entry);
+                    break;
+                }
+            }*/
+        }
+        //Log.d("LinearElimination", "Reduced suggestions: " + reducedSuggestionList.size());
+        return reducedSuggestionList;
+    }
+
+    private String stringJoin(List<String> letters){
+        String result = "";
+        for (int i = 0; i < letters.size(); i++) {
+            result += letters.get(i);
+        }
+        return result;
     }
 
     private void isWordHistoryInitialized(){
@@ -54,24 +93,6 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
         wordHistory = new ArrayList<>();
         SearchEntry entry = new SearchEntry(fullDictionary, new ArrayList<String>(0));
         wordHistory.add(entry);
-    }
-
-    private List<DictionaryEntry> reduceValidSuggestions(List<String> lettersToFindAtIndex, List<DictionaryEntry> searchList){
-        List<DictionaryEntry> reducedSuggestionList = new ArrayList<>();
-        int searchIndex = findSearchIndex();
-        //Log.d("LinearElimination", "Original suggestions: " + searchList.size());
-        for (DictionaryEntry entry : searchList) {
-            for (int i = 0; i < lettersToFindAtIndex.size(); i++) {
-                String letter = lettersToFindAtIndex.get(i);
-                boolean contained = entry.getWord().substring(searchIndex).startsWith(letter); //TODO fix index out of bounds exception
-                if (contained) {
-                    reducedSuggestionList.add(entry);
-                    break;
-                }
-            }
-        }
-        //Log.d("LinearElimination", "Reduced suggestions: " + reducedSuggestionList.size());
-        return reducedSuggestionList;
     }
 
     /**
@@ -176,7 +197,7 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
      * @return
      */
     public List<String> getDefaultSuggestion(int n){
-        isWordHistoryInitialized();
+
         List<DictionaryEntry> dictionaryEntryList;
         List<String> resultList;
 
@@ -258,7 +279,29 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
         fullDictionaryFrequencySorted.addAll(dictionary);
         ListSorter.sortList(fullDictionaryFrequencySorted, SortingOrder.FREQUENCY_HIGH_TO_LOW);
 
+        isWordHistoryInitialized();
+
+        List<List<String>> letterGroups = new ArrayList<>();
+        letterGroups.add(Arrays.asList("e", "t", "a"));
+        letterGroups.add(Arrays.asList("o", "i", "n"));
+        letterGroups.add(Arrays.asList("s", "r", "h"));
+        letterGroups.add(Arrays.asList("l", "d", "c", "u"));
+        letterGroups.add(Arrays.asList("w", "y", "b", "v"));
+        letterGroups.add(Arrays.asList("m", "f", "p", "g"));
+        letterGroups.add(Arrays.asList("k", "x", "j", "q", "z"));
+
+        for (List<String> letters: letterGroups) {
+            String lettersJoined = stringJoin(letters);
+            List<DictionaryEntry> searchResult = reduceValidSuggestions(letters, fullDictionaryFrequencySorted);
+            searchCache.put(lettersJoined,searchResult);
+        }
+
+
+        System.out.println(searchCache.get("eta"));
+        System.out.println(searchCache.get("eta").size());
     }
+
+
 
     @Override
     public List<DictionaryEntry> getDictionary() {
