@@ -8,14 +8,18 @@ import no.ntnu.stud.avikeyb.backend.dictionary.LinearEliminationDictionaryHandle
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Created by Tor Martin Holen on 24-Mar-17.
  */
 public class MobileLayoutTestBase extends LayoutTestBase {
+
+    protected MobileLayout layout;
     @Override
     protected Layout createLayout() {
         List<DictionaryEntry> entries = new DictionaryFileLoader(getClass().getClassLoader().getResource("dictionary.txt").getPath()).loadDictionary();
-        MobileLayout layout = new MobileLayout(keyboard, new LinearEliminationDictionaryHandler(), entries);
+        layout = new MobileLayout(keyboard, new LinearEliminationDictionaryHandler(), entries);
         return layout;
     }
     
@@ -156,5 +160,9 @@ public class MobileLayoutTestBase extends LayoutTestBase {
             select();
         }
     }
-    
+
+
+    protected void assertExpectedHistorySize(int expected) {
+        assertEquals(expected, layout.getDictionary().getWordHistorySize());
+    }
 }

@@ -1,15 +1,15 @@
 package no.ntnu.stud.avikeyb.backend.layouts;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import no.ntnu.stud.avikeyb.backend.InputType;
 import no.ntnu.stud.avikeyb.backend.Keyboard;
 import no.ntnu.stud.avikeyb.backend.Symbol;
 import no.ntnu.stud.avikeyb.backend.dictionary.DictionaryEntry;
 import no.ntnu.stud.avikeyb.backend.dictionary.LinearEliminationDictionaryHandler;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -201,8 +201,13 @@ public class MobileLayout extends StepLayout {
                     handleWordCorrection();
                 } else if (markedSymbols.contains(Symbol.DELETION_DONE)) {
                     changeStateRowSelection();
-                } else if (markedSymbols.contains(Symbol.SPACE) || markedSymbols.contains(Symbol.PERIOD) || markedSymbols.contains(Symbol.COMMA) || markedSymbols.contains(Symbol.EXCLAMATION_MARK) || markedSymbols.contains(Symbol.QUESTION_MARK)) {
+                } else if (markedSymbols.contains(Symbol.PERIOD) || markedSymbols.contains(Symbol.COMMA) || markedSymbols.contains(Symbol.EXCLAMATION_MARK) || markedSymbols.contains(Symbol.QUESTION_MARK)) {
                     handleWordSeparatingSymbols();
+                } else if (markedSymbols.contains(Symbol.SPACE)) {
+                    finishWordWithSpace();
+                    setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
+                    state = State.SELECT_ROW;
+                    reset();
                 } else if (mode == Mode.LETTER_SELECTION_MODE) {
                     handleLetterSelected();
                 }
@@ -216,20 +221,12 @@ public class MobileLayout extends StepLayout {
                 nextDictionaryRow();
                 break;
             case INPUT2:
-                handleDictionaryWordSelection();
+                finishWordWithDictionary();
+                setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
+                state = State.SELECT_ROW;
+                reset();
                 break;
         }
-    }
-
-    private void handleDictionaryWordSelection() {
-        if (mode == Mode.TILE_SELECTION_MODE) {
-            addWord();
-        } else if (mode == Mode.LETTER_SELECTION_MODE) {
-            addWordWithNoDictionary();
-        }
-        setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
-        state = State.SELECT_ROW;
-        reset();
     }
 
     /**
@@ -300,7 +297,7 @@ public class MobileLayout extends StepLayout {
             if (mode == Mode.TILE_SELECTION_MODE) {
                 deleteLastWord();
             } else if (mode == Mode.LETTER_SELECTION_MODE) {
-                removeLastLetter();
+                fixWord();
             }
 
             dictionary.previousWord();
@@ -312,6 +309,40 @@ public class MobileLayout extends StepLayout {
             }
 
         }
+    }
+
+    private void deleteLastWord() {
+        dictionary.previousWord();
+        if (dictionary.isCurrentHistoryEntrySpecial()) {
+            removeSpecial();
+        } else {
+            keyboard.deleteLastWord();
+        }
+        setDefaultSuggestions();
+        dictionary.nextWord();
+
+    }
+
+    private void fixWord() {
+        String currentText = keyboard.getCurrentBuffer();
+        int textLength = currentText.length();
+        if (textLength >= 2) {
+            String lastTwoCharacters = currentText.substring(textLength - 2, textLength);
+            if (lastTwoCharacters.matches("[.,!?][ ]")) {
+                removeSpecial();
+            } else {
+                removeLastLetter();
+            }
+        } else {
+            removeLastLetter();
+        }
+    }
+
+    private void removeSpecial() {
+        keyboard.deleteLastCharacter();
+        keyboard.deleteLastCharacter();
+        keyboard.addToCurrentBuffer(" ");
+        dictionary.clearWordHistory();
     }
 
     private void sliceWordToHistoryLength() {
@@ -357,6 +388,7 @@ public class MobileLayout extends StepLayout {
         changeStateRowSelection();
     }
 
+
     private void handleLetterSelected() {
         String marked = getMarkedSymbols().get(0).getContent();
         dictionary.findValidSuggestions(Collections.singletonList(marked), false);
@@ -364,7 +396,6 @@ public class MobileLayout extends StepLayout {
         selectCurrentSymbols();
         changeStateRowSelection();
     }
-
 
     private void changeStateRowSelection() {
         state = State.SELECT_ROW;
@@ -393,6 +424,10 @@ public class MobileLayout extends StepLayout {
 
     public Mode getMode() {
         return mode;
+    }
+
+    public LinearEliminationDictionaryHandler getDictionary() {
+        return dictionary;
     }
 
     /**
@@ -426,14 +461,15 @@ public class MobileLayout extends StepLayout {
      * @return string with word capitalized, if it starts with a letter.
      */
     private String capitalizeWord(String currentWord) {
-        String capitalizedLetter = currentWord.substring(0, 1).toUpperCase();
-        if (currentWord.substring(0, 1).matches("[a-z]")) {
-            return currentWord.replaceFirst("[a-z]", capitalizedLetter);
-        } else {
-            return currentWord;
+        if (currentWord.length() > 0) {
+            String capitalizedLetter = currentWord.substring(0, 1).toUpperCase();
+            if (currentWord.substring(0, 1).matches("[a-z]")) {
+                return currentWord.replaceFirst("[a-z]", capitalizedLetter);
+            }
         }
-
+        return currentWord;
     }
+
 
     /**
      * Capitalizes a word that should be added to a text, if deemed appropriate.
@@ -455,44 +491,29 @@ public class MobileLayout extends StepLayout {
         return nextWord;
     }
 
-
     private void removeLastLetter() {
-        String currentBuffer = keyboard.getCurrentBuffer();
-        int endIndex = currentBuffer.length() - 1;
-        if (endIndex >= 0) {
-            currentBuffer = currentBuffer.substring(0, endIndex);
-            keyboard.clearCurrentBuffer();
-            keyboard.addToCurrentBuffer(currentBuffer);
-        }
+        keyboard.deleteLastCharacter();
     }
 
-    private void deleteLastWord() {
-        String currentWord = keyboard.getCurrentBuffer();
-        if (currentWord.matches("[a-zA-Z]+[!?.,][ ]")) {
-            keyboard.deleteLastCharacter();
-            keyboard.deleteLastCharacter();
-            keyboard.addToCurrentBuffer(" ");
-        } else {
-            keyboard.deleteLastWord();
-        }
-
-    }
-
-
-    private void addWord() {
+    private void finishWordWithDictionary() {
         String currentText = keyboard.getCurrentBuffer();
-        String currentWord = getSuggestions().get(location[3]);
+        String dictionaryWord = getSuggestions().get(location[3]);
 
-        currentWord = capitalizationCheck(currentText, currentWord);
+        dictionaryWord = capitalizationCheck(currentText, dictionaryWord);
+        if (mode == Mode.TILE_SELECTION_MODE || dictionary.getWordHistorySize() == 0) {
+            keyboard.addToCurrentBuffer(dictionaryWord + " ");
+        } else if (mode == Mode.LETTER_SELECTION_MODE) {
+            int remainingLetters = keyboard.getCurrentWord().length();
+            keyboard.addToCurrentBuffer(dictionaryWord.substring(remainingLetters) + " ");
+        }
 
-        keyboard.addToCurrentBuffer(currentWord + " ");
         dictionary.nextWord();
 
     }
 
-    private void addWordWithNoDictionary() {
-        deleteLastWord();
-        addWord();
+    private void finishWordWithSpace() {
+        keyboard.addToCurrentBuffer(" ");
+        dictionary.nextWord();
     }
 
     private void setCurrentSuggestions() {
