@@ -35,6 +35,8 @@ public class MobileLayout extends StepLayout implements LayoutWithSuggestions {
 
     private LinearEliminationDictionaryHandler dictionary;
 
+    private List<Integer> cachedRowsTileMode = new ArrayList<>();
+    private List<Integer> cachedRowsLetterMode = new ArrayList<>();
 
     public enum State {
         SELECT_ROW,
@@ -49,25 +51,31 @@ public class MobileLayout extends StepLayout implements LayoutWithSuggestions {
     }
 
 
-    public MobileLayout(Keyboard keyboard, LinearEliminationDictionaryHandler dictionary) {
+    public MobileLayout(Keyboard keyboard, final LinearEliminationDictionaryHandler dictionary) {
         suggestions = new ArrayList<>();
         this.keyboard = keyboard;
         this.dictionary = dictionary;
-
-
         updateLayoutStructure();
-        /*MobileLayoutSwap.onStart();*/
-        setDefaultSuggestions();
+
         nextRow();
+        cacheExecution();
     }
 
+    /**
+     * Constructor used for tests ONLY
+     *
+     * @param keyboard
+     * @param dictionary
+     * @param entries
+     */
     public MobileLayout(Keyboard keyboard, LinearEliminationDictionaryHandler dictionary, List<DictionaryEntry> entries) {
         suggestions = new ArrayList<>();
         this.keyboard = keyboard;
         dictionary.setDictionary(entries);
+        //dictionary.startCaching();
+
         this.dictionary = dictionary;
         updateLayoutStructure();
-        /*MobileLayoutSwap.onStart();*/
         setDefaultSuggestions();
         nextRow();
     }
@@ -138,9 +146,11 @@ public class MobileLayout extends StepLayout implements LayoutWithSuggestions {
     protected void onStep(InputType input) {
         switch (state) {
             case SELECT_ROW:
+                cacheExecution();
                 onStepRowMode(input);
                 break;
             case SELECT_COLUMN:
+
                 onStepColumnMode(input);
                 break;
             case SELECT_LETTER:
@@ -150,9 +160,73 @@ public class MobileLayout extends StepLayout implements LayoutWithSuggestions {
                 onStepDictionaryMode(input);
                 break;
         }
+
         notifyLayoutListeners();
     }
 
+    /**
+     * Checks the marked row's current elements whenever or not they are cached in the {@link LinearEliminationDictionaryHandler},
+     * if not a thread is started to handle the caching.
+     */
+    private void cacheExecution() {
+        switch (mode) {
+            case TILE_SELECTION_MODE:
+                if (!cachedRowsTileMode.contains(location[0])) {
+                    final List<List<String>> rowPossibilities = getRowTiles();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (final List<String> list : rowPossibilities) {
+                                dictionary.cacheInputTile(list);
+                            }
+                        }
+                    }).start();
+                    cachedRowsTileMode.add(location[0]);
+                }
+                break;
+            case LETTER_SELECTION_MODE:
+                if (!cachedRowsLetterMode.contains(location[0])) {
+                    final List<String> markedSymbolStrings = getStringsFromMarkedSymbols();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dictionary.cacheInputSingleLetters(markedSymbolStrings);
+                        }
+                    }).start();
+                    cachedRowsLetterMode.add(location[0]);
+                    break;
+                }
+        }
+    }
+
+    /**
+     * Obtains the content the current row's tiles.
+     * Note this method will contain strings of symbols that aren't single letters, so these must be handled properly.
+     * @return A list containing a list of strings (tile).
+     */
+    private List<List<String>> getRowTiles() {
+        List<List<String>> result = new ArrayList<>();
+        List<Symbol> first = new ArrayList<>();
+        while (!markedSymbols.equals(first)) {
+            if (first.isEmpty()) {
+                nextColumn();
+                first = markedSymbols;
+                result.add(getStringsFromMarkedSymbols());
+                nextColumn();
+            } else {
+                nextColumn();
+            }
+            result.add(getStringsFromMarkedSymbols());
+            logMarked();
+        }
+        location[1] = -1;
+        return result;
+    }
+
+    /**
+     * Handles the input logic for rows.
+     * @param input
+     */
     private void onStepRowMode(InputType input) {
         switch (input) {
             case INPUT1: //Move
@@ -164,6 +238,10 @@ public class MobileLayout extends StepLayout implements LayoutWithSuggestions {
         }
     }
 
+    /**
+     * Handles the input logic for columns.
+     * @param input
+     */
     private void onStepColumnMode(InputType input) {
         switch (input) {
             case INPUT1:
@@ -182,15 +260,19 @@ public class MobileLayout extends StepLayout implements LayoutWithSuggestions {
                 } else if (markedSymbols.contains(Symbol.MODE_TOGGLE)) {
                     handleModeToggle();
                 } else if (mode == Mode.TILE_SELECTION_MODE) {
-                    letterGroupPressed();
+                    letterTilePressed();
                 } else if (mode == Mode.LETTER_SELECTION_MODE) {
                     changeStateLetterSelection();
                 }
-                //logMarked();
+
                 break;
         }
     }
 
+    /**
+     * Handles the input logic for letter selection.
+     * @param input
+     */
     private void onStepLetterMode(InputType input) {
         switch (input) {
             case INPUT1:
@@ -217,6 +299,10 @@ public class MobileLayout extends StepLayout implements LayoutWithSuggestions {
         }
     }
 
+    /**
+     * Handles input logic for dictionary selection
+     * @param input
+     */
     private void onStepDictionaryMode(InputType input) {
         switch (input) {
             case INPUT1:
@@ -262,7 +348,7 @@ public class MobileLayout extends StepLayout implements LayoutWithSuggestions {
     }
 
 
-    private void letterGroupPressed() {
+    private void letterTilePressed() {
         BackendLogger.log("BeforeSearch");
         dictionary.findValidSuggestions(getStringsFromMarkedSymbols(), true);
         setSuggestions(dictionary.getSuggestions(nSuggestions));
@@ -453,7 +539,7 @@ public class MobileLayout extends StepLayout implements LayoutWithSuggestions {
         for (Symbol sym : markedSymbols) {
             result += sym.getContent() + " ";
         }
-        //Log.d("MobLayout", "Marked symbols: " + result);
+        BackendLogger.log("Marked symbols: " + result);
     }
 
     public void softReset() {
@@ -698,6 +784,10 @@ public class MobileLayout extends StepLayout implements LayoutWithSuggestions {
 
     public void setDictionaryList(List<DictionaryEntry> list) {
         dictionary.setDictionary(list);
+    }
+
+    public boolean isLayoutReady() {
+        return dictionary.isCachingThreadFinished();
     }
 
 }
