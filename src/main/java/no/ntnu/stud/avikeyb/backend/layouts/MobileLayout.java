@@ -786,8 +786,5 @@ public class MobileLayout extends StepLayout implements LayoutWithSuggestions {
         dictionary.setDictionary(list);
     }
 
-    public boolean isLayoutReady() {
-        return dictionary.isCachingThreadFinished();
-    }
 
 }
