@@ -3,6 +3,7 @@ package no.ntnu.stud.avikeyb.backend.layouts;
 import java.util.ArrayList;
 import java.util.List;
 
+import no.ntnu.stud.avikeyb.backend.InputType;
 import no.ntnu.stud.avikeyb.backend.Layout;
 import no.ntnu.stud.avikeyb.backend.layouts.util.LayoutState;
 
@@ -15,6 +16,13 @@ public abstract class BaseLayout implements Layout {
 
     public BaseLayout() {
         listeners = new ArrayList<>();
+    }
+
+
+
+    @Override
+    public void sendInputSignal(InputType input) {     // Implements the input interface
+        onStep(input);
     }
 
     @Override
@@ -44,4 +52,11 @@ public abstract class BaseLayout implements Layout {
             listener.onLayoutChanged();
         }
     }
+
+    /**
+     * Called when a input signal of the specified type is detected
+     *
+     * @param input the input signal type that was registered
+     */
+    protected abstract void onStep(InputType input);
 }

@@ -10,7 +10,7 @@ import no.ntnu.stud.avikeyb.backend.layouts.util.LayoutState;
 /**
  * Simple layout for testing
  */
-public class SimpleExampleLayout extends StepLayout {
+public class SimpleExampleLayout extends BaseLayout {
 
     // The symbols available in the layout.
     private static Symbol[] symbols = Symbols.merge(

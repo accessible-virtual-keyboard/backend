@@ -6,11 +6,10 @@ package no.ntnu.stud.avikeyb.backend;
 public interface InputInterface {
 
     /**
-     * Sets the current input state of the signal of the specified type
+     * Sends a input signal to the keyboard
      *
      * @param input the input signal type
-     * @param value boolean indicating if the signal is on or off
      */
-    void setInputState(InputType input, boolean value);
+    void sendInputSignal(InputType input);
 
 }

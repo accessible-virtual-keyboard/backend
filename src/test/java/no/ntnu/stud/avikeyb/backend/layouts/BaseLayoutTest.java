@@ -29,9 +29,9 @@ public class BaseLayoutTest {
         layout.addLayoutListener(listener);
 
         assertEquals(0, listener.getChangeCounter());
-        layout.setInputState(InputType.INPUT1, true);
+        layout.sendInputSignal(InputType.INPUT1);
         assertEquals(1, listener.getChangeCounter());
-        layout.setInputState(InputType.INPUT1, false);
+        layout.sendInputSignal(InputType.INPUT1);
         assertEquals(2, listener.getChangeCounter());
 
     }
@@ -43,10 +43,9 @@ public class BaseLayoutTest {
         layout.addLayoutListener(listener);
 
         assertEquals(0, listener.getChangeCounter());
-        layout.setInputState(InputType.INPUT1, true);
+        layout.sendInputSignal(InputType.INPUT1);
         assertEquals(1, listener.getChangeCounter());
         layout.removeLayoutListener(listener);
-        layout.setInputState(InputType.INPUT1, false);
 
         // Should still be 1
         assertEquals(1, listener.getChangeCounter());
@@ -55,7 +54,7 @@ public class BaseLayoutTest {
 
     private static class TestLayout extends BaseLayout {
         @Override
-        public void setInputState(InputType input, boolean value) {
+        protected void onStep(InputType input) {
             notifyLayoutListeners();
         }
     }

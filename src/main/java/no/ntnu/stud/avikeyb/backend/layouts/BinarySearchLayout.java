@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Basic binary search layout
  */
-public class BinarySearchLayout extends StepLayout implements LayoutWithSuggestions {
+public class BinarySearchLayout extends BaseLayout implements LayoutWithSuggestions {
 
 
     // Only used for letting the ui know all the symbols in the layout

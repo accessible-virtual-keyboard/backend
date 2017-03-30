@@ -1,5 +1,6 @@
 package no.ntnu.stud.avikeyb.backend.layouts;
 
+import com.sun.xml.internal.rngom.parse.host.Base;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,7 +13,7 @@ import static org.junit.Assert.assertNull;
 /**
  * Created by pitmairen on 08/02/2017.
  */
-public class StepLayoutTest {
+public class LayoutStepTest {
 
 
     private StepLayoutImpl layout;
@@ -29,33 +30,29 @@ public class StepLayoutTest {
 
         assertNull(layout.getLastInput());
 
-        layout.setInputState(InputType.INPUT1, true);
         assertNotEquals(InputType.INPUT1, layout.getLastInput());
-        layout.setInputState(InputType.INPUT1, false);
+        layout.sendInputSignal(InputType.INPUT1);
         assertEquals(InputType.INPUT1, layout.getLastInput());
         assertNotEquals(InputType.INPUT2, layout.getLastInput());
         assertNotEquals(InputType.INPUT3, layout.getLastInput());
         assertNotEquals(InputType.INPUT4, layout.getLastInput());
 
-        layout.setInputState(InputType.INPUT2, true);
         assertNotEquals(InputType.INPUT2, layout.getLastInput());
-        layout.setInputState(InputType.INPUT2, false);
+        layout.sendInputSignal(InputType.INPUT2);
         assertNotEquals(InputType.INPUT1, layout.getLastInput());
         assertEquals(InputType.INPUT2, layout.getLastInput());
         assertNotEquals(InputType.INPUT3, layout.getLastInput());
         assertNotEquals(InputType.INPUT4, layout.getLastInput());
 
-        layout.setInputState(InputType.INPUT3, true);
         assertNotEquals(InputType.INPUT3, layout.getLastInput());
-        layout.setInputState(InputType.INPUT3, false);
+        layout.sendInputSignal(InputType.INPUT3);
         assertNotEquals(InputType.INPUT1, layout.getLastInput());
         assertNotEquals(InputType.INPUT2, layout.getLastInput());
         assertEquals(InputType.INPUT3, layout.getLastInput());
         assertNotEquals(InputType.INPUT4, layout.getLastInput());
 
-        layout.setInputState(InputType.INPUT4, true);
         assertNotEquals(InputType.INPUT4, layout.getLastInput());
-        layout.setInputState(InputType.INPUT4, false);
+        layout.sendInputSignal(InputType.INPUT4);
         assertNotEquals(InputType.INPUT1, layout.getLastInput());
         assertNotEquals(InputType.INPUT2, layout.getLastInput());
         assertNotEquals(InputType.INPUT3, layout.getLastInput());
@@ -63,7 +60,7 @@ public class StepLayoutTest {
     }
 
 
-    private static class StepLayoutImpl extends StepLayout {
+    private static class StepLayoutImpl extends BaseLayout {
 
         private InputType lastInput;
 

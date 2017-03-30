@@ -17,7 +17,7 @@ import java.util.List;
  * to follow the last typed letter are placed at the positions that requires the least amount
  * of steps to be selected in the layout.
  */
-public class AdaptiveLayout extends StepLayout implements LayoutWithSuggestions {
+public class AdaptiveLayout extends BaseLayout implements LayoutWithSuggestions {
 
     /**
      * The possible layout states

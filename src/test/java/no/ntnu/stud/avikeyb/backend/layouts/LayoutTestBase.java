@@ -61,7 +61,6 @@ public abstract class LayoutTestBase {
      * @param inputType the signal type to send to the layout
      */
     protected void stepInput(InputType inputType) {
-        layout.setInputState(inputType, true);
-        layout.setInputState(inputType, false);
+        layout.sendInputSignal(inputType);
     }
 }

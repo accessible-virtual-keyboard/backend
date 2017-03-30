@@ -13,7 +13,7 @@ import java.util.List;
  * Created by ingalill on 10/02/2017.
  */
 
-public class ETOSLayout extends StepLayout implements LayoutWithSuggestions {
+public class ETOSLayout extends BaseLayout implements LayoutWithSuggestions {
 
     /*private static Symbol[] symbols = Symbols.merge(
             Symbols.build(Symbol.SEND),
