@@ -165,4 +165,8 @@ public class MobileLayoutTestBase extends LayoutTestBase {
     protected void assertExpectedHistorySize(int expected) {
         assertEquals(expected, layout.getDictionary().getWordHistorySize());
     }
+
+    protected void assertExpectedNumberOfSuggestions(int expected){
+        assertEquals(expected, layout.getSuggestions().size());
+    }
 }

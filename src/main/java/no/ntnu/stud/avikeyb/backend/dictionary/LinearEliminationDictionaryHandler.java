@@ -70,8 +70,9 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
     /**
      * A search method and help method to {@link #findValidSuggestions(List, boolean)} which reduces the number of plausible suggestion, to words containing one of the letters contained in the first parameter at the index calculated.
      * Note: the return value of this method must be added to the global wordHistory variable before it can be used again, if not the search index won't update.
+     *
      * @param lettersToFindAtIndex the index currently being searches, usually for every search this will increment by one.
-     * @param searchList The list being searched.
+     * @param searchList           The list being searched.
      * @return A list of plausible dictionary entries matching the new search conditions.
      */
     private List<DictionaryEntry> reduceValidSuggestions(List<String> lettersToFindAtIndex, List<DictionaryEntry> searchList) {
@@ -106,7 +107,6 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
         SearchEntry entry = new SearchEntry(fullDictionary, new ArrayList<String>(0));
         wordHistory.add(entry);
     }
-
 
 
     /**
@@ -164,7 +164,6 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
     }
 
 
-
     /**
      * Finds the index where last suggestion list should be searched to eliminate unfit words.
      *
@@ -192,6 +191,7 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
 
     /**
      * Adds punctuation symbols as a separate word history element for the phrase history.
+     *
      * @param specialCharacter The following characters ".,!?"  are considered special.
      */
     public void addSpecialCharacterHistoryEntry(String specialCharacter) {
@@ -210,6 +210,7 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
 
     /**
      * Checks if the current
+     *
      * @return true if a element
      */
     public boolean hasWordHistory() {
@@ -225,10 +226,9 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
     }
 
 
-
-
     /**
      * Checks if the current word history special, i.e it contains a punctuation symbol (.,!?)
+     *
      * @return true if the word history contains a special character.
      */
     public boolean isCurrentHistoryEntrySpecial() {
@@ -255,6 +255,7 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
 
     /**
      * Caches a tile of letters, should be called some time before the search will probably occur.
+     *
      * @param letters A tile of letters from {@link no.ntnu.stud.avikeyb.backend.layouts.MobileLayout}
      */
     public void cacheInputTile(final List<String> letters) {
@@ -267,6 +268,7 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
 
     /**
      * Caches single letter searches, this should be called some time before a new unique single letter search occurs.
+     *
      * @param letterList List containing single letters, each matching [a-z].
      */
     public void cacheInputSingleLetters(final List<String> letterList) {
@@ -339,6 +341,7 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
 
     /**
      * Searches the dictionary list for words starting with a letter contained in the letters string.
+     *
      * @param letters the letters to search for
      * @return A list containing lists with the matching dictionary entries for each letter, the list's lists corresponds to the order of the letters string.
      */
@@ -363,6 +366,7 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
 
     /**
      * Joins a list of strings to a single string, but only the elements that consist of a single character and matchesthe regex [a-z]
+     *
      * @param letters list of letters being joined
      * @return a single string of letters
      */
@@ -377,7 +381,6 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
         return result.toString();
     }
 
-
     /**
      * Help class responsible for storing searches and its corresponding result.
      * It is used in accordance with wordHistory, to provide the history feature.
@@ -389,8 +392,9 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
 
         /**
          * Normal constructor for creating a search entry.
+         *
          * @param searchResult The result of a search
-         * @param search A list of single letters that was searched for
+         * @param search       A list of single letters that was searched for
          */
         public SearchEntry(List<DictionaryEntry> searchResult, List<String> search) {
             this.searchResult = searchResult;
@@ -400,6 +404,7 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
 
         /**
          * Special constructor used only when a special letter should be added to the word history.
+         *
          * @param specialCharacter string containing a punctuation symbol (.,!?)
          */
         public SearchEntry(String specialCharacter) {
@@ -448,11 +453,10 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
     public List<DictionaryEntry> getSuggestionsWithFrequencies(int n) {
         List<DictionaryEntry> lastSuggestions = getLastSuggestions();
         ListSorter.sortList(lastSuggestions, SortingOrder.FREQUENCY_HIGH_TO_LOW);
-        if (lastSuggestions.size() < n) {
-            return lastSuggestions;
-        } else {
-            return lastSuggestions.subList(0, n);
-        }
+
+        n = (lastSuggestions.size() <= n) ? lastSuggestions.size() : n;
+        BackendLogger.log("Number of suggestions requested: " + n);
+        return new ArrayList<>(lastSuggestions.subList(0, n));
     }
 
     /**
@@ -474,22 +478,17 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
      * @return
      */
     public List<String> getDefaultSuggestion(int n) {
-
-        List<DictionaryEntry> dictionaryEntryList;
-        List<String> resultList;
-
-        if (n > fullDictionaryFrequencySorted.size()) {
-            dictionaryEntryList = fullDictionaryFrequencySorted;
-            resultList = new ArrayList<>(fullDictionaryFrequencySorted.size());
-        } else {
-            dictionaryEntryList = fullDictionaryFrequencySorted.subList(0, n);
-            resultList = new ArrayList<>(n);
-        }
+        n = (fullDictionaryFrequencySorted.size() <= n) ? fullDictionaryFrequencySorted.size() : n;
+        List<DictionaryEntry> dictionaryEntryList = new ArrayList<>(fullDictionaryFrequencySorted.subList(0, n));
+        List<String> resultList = new ArrayList<>(n);
 
         for (int i = 0; i < dictionaryEntryList.size(); i++) {
             DictionaryEntry de = dictionaryEntryList.get(i);
             resultList.add(de.getWord());
         }
+        BackendLogger.log("Default suggestions calculated: " + resultList.size());
+        BackendLogger.log(resultList.toString());
+        BackendLogger.log("Number of suggestions requested (n): " + n);
         return resultList;
     }
 
@@ -516,6 +515,7 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
 
     /**
      * Creates a list of previous searches for the current word history
+     *
      * @return list of previous searches as a string.
      */
     public List<String> getHistory() {

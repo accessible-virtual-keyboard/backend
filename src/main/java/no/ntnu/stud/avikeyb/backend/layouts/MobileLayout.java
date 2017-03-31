@@ -51,14 +51,18 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
     }
 
 
+    /**
+     * Constructor for Front-End applications that want to connect to the Back-End.
+     * @param keyboard
+     * @param dictionary
+     */
     public MobileLayout(Keyboard keyboard, final LinearEliminationDictionaryHandler dictionary) {
         suggestions = new ArrayList<>();
         this.keyboard = keyboard;
         this.dictionary = dictionary;
         updateLayoutStructure();
-
-        nextRow();
-        cacheExecution();
+        setDefaultSuggestions();
+        onStep(InputType.INPUT1);
     }
 
     /**
@@ -77,7 +81,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
         this.dictionary = dictionary;
         updateLayoutStructure();
         setDefaultSuggestions();
-        nextRow();
+        onStep(InputType.INPUT1);
     }
 
     /**
@@ -150,7 +154,6 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                 onStepRowMode(input);
                 break;
             case SELECT_COLUMN:
-
                 onStepColumnMode(input);
                 break;
             case SELECT_LETTER:
@@ -231,11 +234,18 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
         switch (input) {
             case INPUT1: //Move
                 nextRow();
+                /*TODO for some odd reason the suggestions is empty after nextRow() in LETTER_SELECTION_MODE,
+                so the cause of why it is empty should be found and then the if statement below should be removable, note the tests are successful, but the mobile app
+                */
+                if(mode == Mode.LETTER_SELECTION_MODE && suggestions.size() == 0){
+                    setCurrentSuggestions();
+                }
                 break;
             case INPUT2: //Select
                 changeStateColumnSelection();
                 break;
         }
+        BackendLogger.log("SUGGESTION_DEBUG: " + suggestions.size());
     }
 
     /**
@@ -267,6 +277,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
 
                 break;
         }
+        BackendLogger.log("SUGGESTION_DEBUG: " + suggestions.size());
     }
 
     /**
@@ -289,7 +300,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                     handleWordSeparatingSymbols();
                 } else if (markedSymbols.contains(Symbol.SPACE)) {
                     finishWordWithSpace();
-                    setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
+                    setDefaultSuggestions();
                     state = State.SELECT_ROW;
                     reset();
                 } else if (mode == Mode.LETTER_SELECTION_MODE) {
@@ -297,6 +308,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                 }
                 break;
         }
+        BackendLogger.log("SUGGESTION_DEBUG: " + suggestions.size());
     }
 
     /**
@@ -310,11 +322,12 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                 break;
             case INPUT2:
                 finishWordWithDictionary();
-                setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
+                setDefaultSuggestions();
                 state = State.SELECT_ROW;
                 reset();
                 break;
         }
+        BackendLogger.log("SUGGESTION_DEBUG: " + suggestions.size());
     }
 
     /**
@@ -609,10 +622,6 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
         dictionary.nextWord();
     }
 
-    private void setCurrentSuggestions() {
-        setSuggestions(dictionary.getSuggestions(nSuggestions));
-    }
-
     private void writeSymbol() {
         String keyboardInput = keyboard.getCurrentBuffer().trim();
         keyboard.clearCurrentBuffer();
@@ -621,10 +630,6 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
         if (!markedSymbols.get(0).getContent().equals(" ")) {
             keyboard.addToCurrentBuffer(" ");
         }
-    }
-
-    private void setDefaultSuggestions() {
-        setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
     }
 
     /**
@@ -762,7 +767,20 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
 
 
     public void setSuggestions(List<String> suggestions) {
-        this.suggestions = suggestions;
+        this.suggestions = new ArrayList<>();
+        this.suggestions.addAll(suggestions);
+    }
+
+    private void setCurrentSuggestions() {
+        BackendLogger.log("Number of current suggestions before set: " + suggestions.size());
+        setSuggestions(dictionary.getSuggestions(nSuggestions));
+        BackendLogger.log("Number of current suggestions after set: " + suggestions.size());
+    }
+
+    private void setDefaultSuggestions() {
+        BackendLogger.log("Number of default suggestions before set: " + suggestions.size());
+        setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
+        BackendLogger.log("Number of default suggestions after set: " + suggestions.size());
     }
 
     public int getMarkedWord() {
@@ -771,7 +789,9 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
 
 
     public List<String> getSuggestions() {
-        return suggestions;
+        BackendLogger.log("Number of suggestions: " + suggestions.size());
+        BackendLogger.log(suggestions.toString());
+        return new ArrayList<>(suggestions);
     }
 
     public State getState() {
