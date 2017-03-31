@@ -19,7 +19,7 @@ import java.util.List;
  * Created by Tor-Martin Holen on 21-Feb-17.
  */
 
-public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
+public class MobileLayout extends BaseLayout{
 
     private int[] stepIndices;
     private Symbol[] symbols;

@@ -1,6 +1,5 @@
 package no.ntnu.stud.avikeyb.backend.layouts;
 
-import com.sun.xml.internal.rngom.parse.host.Base;
 import org.junit.Before;
 import org.junit.Test;
 
