@@ -455,7 +455,6 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
         ListSorter.sortList(lastSuggestions, SortingOrder.FREQUENCY_HIGH_TO_LOW);
 
         n = (lastSuggestions.size() <= n) ? lastSuggestions.size() : n;
-        BackendLogger.log("Number of suggestions requested: " + n);
         return new ArrayList<>(lastSuggestions.subList(0, n));
     }
 
@@ -486,9 +485,8 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
             DictionaryEntry de = dictionaryEntryList.get(i);
             resultList.add(de.getWord());
         }
-        BackendLogger.log("Default suggestions calculated: " + resultList.size());
-        BackendLogger.log(resultList.toString());
-        BackendLogger.log("Number of suggestions requested (n): " + n);
+        /*BackendLogger.log(resultList.toString());*/
+
         return resultList;
     }
 

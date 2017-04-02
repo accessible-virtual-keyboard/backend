@@ -147,7 +147,7 @@ public class MobileLayoutTest extends MobileLayoutTestBase {
     @Test
     public void defaultNumberOfSuggestions(){
         selectDictionary();
-        assertExpectedNumberOfSuggestions(10);
+        assertExpectedNumberOfSuggestions(20);
     }
 
     @Test

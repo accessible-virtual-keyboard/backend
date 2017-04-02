@@ -31,7 +31,7 @@ public class MobileLayout extends BaseLayout{
     private ArrayList<Symbol> markedSymbols = new ArrayList<>();
     private int[] location = new int[]{-1, -1, -1, -1};
     private List<String> suggestions;
-    private int nSuggestions = 10;
+    private int nSuggestions = 20;
 
     private LinearEliminationDictionaryHandler dictionary;
 
@@ -220,7 +220,7 @@ public class MobileLayout extends BaseLayout{
                 nextColumn();
             }
             result.add(getStringsFromMarkedSymbols());
-            logMarked();
+            /*logMarked();*/
         }
         location[1] = -1;
         return result;
@@ -245,7 +245,7 @@ public class MobileLayout extends BaseLayout{
                 changeStateColumnSelection();
                 break;
         }
-        BackendLogger.log("SUGGESTION_DEBUG: " + suggestions.size());
+
     }
 
     /**
@@ -274,10 +274,8 @@ public class MobileLayout extends BaseLayout{
                 } else if (mode == Mode.LETTER_SELECTION_MODE) {
                     changeStateLetterSelection();
                 }
-
                 break;
         }
-        BackendLogger.log("SUGGESTION_DEBUG: " + suggestions.size());
     }
 
     /**
@@ -308,7 +306,6 @@ public class MobileLayout extends BaseLayout{
                 }
                 break;
         }
-        BackendLogger.log("SUGGESTION_DEBUG: " + suggestions.size());
     }
 
     /**
@@ -327,7 +324,6 @@ public class MobileLayout extends BaseLayout{
                 reset();
                 break;
         }
-        BackendLogger.log("SUGGESTION_DEBUG: " + suggestions.size());
     }
 
     /**
@@ -362,13 +358,9 @@ public class MobileLayout extends BaseLayout{
 
 
     private void letterTilePressed() {
-        BackendLogger.log("BeforeSearch");
         dictionary.findValidSuggestions(getStringsFromMarkedSymbols(), true);
         setSuggestions(dictionary.getSuggestions(nSuggestions));
-        BackendLogger.log("TestAfterSearch");
         reset();
-
-
     }
 
     private void handleLetterSelected() {
@@ -552,7 +544,9 @@ public class MobileLayout extends BaseLayout{
         for (Symbol sym : markedSymbols) {
             result += sym.getContent() + " ";
         }
-        BackendLogger.log("Marked symbols: " + result);
+
+        BackendLogger.log("Marked symbols - " + result + ", Number of marked - " + markedSymbols.size());
+
     }
 
     public void softReset() {
@@ -757,12 +751,12 @@ public class MobileLayout extends BaseLayout{
     }
 
     private void logLocation() {
-        //Log.d("MobLayout", "Position: " + location[0] + ", " + location[1] + ", " + location[2]);
+        BackendLogger.log("Position: " + location[0] + ", " + location[1] + ", " + location[2]);
         String markedSymbolsText = "";
         for (Symbol s : markedSymbols) {
             markedSymbolsText += s.getContent() + " ";
         }
-        //Log.d("MobLayout", markedSymbolsText);
+        BackendLogger.log(markedSymbolsText);
     }
 
 
@@ -772,15 +766,11 @@ public class MobileLayout extends BaseLayout{
     }
 
     private void setCurrentSuggestions() {
-        BackendLogger.log("Number of current suggestions before set: " + suggestions.size());
         setSuggestions(dictionary.getSuggestions(nSuggestions));
-        BackendLogger.log("Number of current suggestions after set: " + suggestions.size());
     }
 
     private void setDefaultSuggestions() {
-        BackendLogger.log("Number of default suggestions before set: " + suggestions.size());
         setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
-        BackendLogger.log("Number of default suggestions after set: " + suggestions.size());
     }
 
     public int getMarkedWord() {
@@ -789,8 +779,6 @@ public class MobileLayout extends BaseLayout{
 
 
     public List<String> getSuggestions() {
-        BackendLogger.log("Number of suggestions: " + suggestions.size());
-        BackendLogger.log(suggestions.toString());
         return new ArrayList<>(suggestions);
     }
 
