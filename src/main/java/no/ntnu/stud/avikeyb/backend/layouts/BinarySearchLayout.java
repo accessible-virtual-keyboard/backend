@@ -189,6 +189,8 @@ public class BinarySearchLayout extends BaseLayout implements LayoutWithSuggesti
         }
         else if(symbol == Symbol.SETTING){
             keyboard.requestChangeSettings();
+            reset();
+            notifyLayoutListeners();
         }
         else {
             keyboard.addToCurrentBuffer(symbol.getContent());
