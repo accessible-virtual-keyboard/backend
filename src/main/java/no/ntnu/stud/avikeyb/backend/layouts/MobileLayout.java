@@ -19,7 +19,7 @@ import java.util.List;
  * Created by Tor-Martin Holen on 21-Feb-17.
  */
 
-public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
+public class MobileLayout extends BaseLayout {
 
     private int[] stepIndices;
     private Symbol[] symbols;
@@ -31,7 +31,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
     private ArrayList<Symbol> markedSymbols = new ArrayList<>();
     private int[] location = new int[]{-1, -1, -1, -1};
     private List<String> suggestions;
-    private int nSuggestions = 10;
+    private int nSuggestions = 20;
 
     private LinearEliminationDictionaryHandler dictionary;
 
@@ -51,14 +51,27 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
     }
 
 
+    /**
+     * Constructor for Front-End applications that want to connect to the Back-End.
+     *
+     * @param keyboard
+     * @param dictionary
+     */
     public MobileLayout(Keyboard keyboard, final LinearEliminationDictionaryHandler dictionary) {
         suggestions = new ArrayList<>();
         this.keyboard = keyboard;
         this.dictionary = dictionary;
         updateLayoutStructure();
-
-        nextRow();
-        cacheExecution();
+        setDefaultSuggestions();
+        onStep(InputType.INPUT1);
+/*        dictionary.setDictionaryChangedListener(new LinearEliminationDictionaryHandler.DictionaryChangedListener() {
+            @Override
+            public void dictionaryChanged() {
+                setDefaultSuggestions();
+                notifyLayoutListeners();
+                BackendLogger.log("DictionaryChanged Interface is called");
+            }
+        });*/
     }
 
     /**
@@ -72,12 +85,11 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
         suggestions = new ArrayList<>();
         this.keyboard = keyboard;
         dictionary.setDictionary(entries);
-        //dictionary.startCaching();
 
         this.dictionary = dictionary;
         updateLayoutStructure();
         setDefaultSuggestions();
-        nextRow();
+        onStep(InputType.INPUT1);
     }
 
     /**
@@ -150,7 +162,6 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                 onStepRowMode(input);
                 break;
             case SELECT_COLUMN:
-
                 onStepColumnMode(input);
                 break;
             case SELECT_LETTER:
@@ -202,6 +213,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
     /**
      * Obtains the content the current row's tiles.
      * Note this method will contain strings of symbols that aren't single letters, so these must be handled properly.
+     *
      * @return A list containing a list of strings (tile).
      */
     private List<List<String>> getRowTiles() {
@@ -217,7 +229,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                 nextColumn();
             }
             result.add(getStringsFromMarkedSymbols());
-            logMarked();
+            /*logMarked();*/
         }
         location[1] = -1;
         return result;
@@ -225,21 +237,27 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
 
     /**
      * Handles the input logic for rows.
+     *
      * @param input
      */
     private void onStepRowMode(InputType input) {
         switch (input) {
             case INPUT1: //Move
                 nextRow();
+                if (mode == Mode.LETTER_SELECTION_MODE && suggestions.size() == 0) {
+                    setCurrentSuggestions();
+                }
                 break;
             case INPUT2: //Select
                 changeStateColumnSelection();
                 break;
         }
+
     }
 
     /**
      * Handles the input logic for columns.
+     *
      * @param input
      */
     private void onStepColumnMode(InputType input) {
@@ -264,13 +282,13 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                 } else if (mode == Mode.LETTER_SELECTION_MODE) {
                     changeStateLetterSelection();
                 }
-
                 break;
         }
     }
 
     /**
      * Handles the input logic for letter selection.
+     *
      * @param input
      */
     private void onStepLetterMode(InputType input) {
@@ -289,7 +307,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                     handleWordSeparatingSymbols();
                 } else if (markedSymbols.contains(Symbol.SPACE)) {
                     finishWordWithSpace();
-                    setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
+                    setDefaultSuggestions();
                     state = State.SELECT_ROW;
                     reset();
                 } else if (markedSymbols.contains(Symbol.MODE_TOGGLE)){
@@ -306,6 +324,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
 
     /**
      * Handles input logic for dictionary selection
+     *
      * @param input
      */
     private void onStepDictionaryMode(InputType input) {
@@ -315,7 +334,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                 break;
             case INPUT2:
                 finishWordWithDictionary();
-                setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
+                setDefaultSuggestions();
                 state = State.SELECT_ROW;
                 reset();
                 break;
@@ -354,13 +373,9 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
 
 
     private void letterTilePressed() {
-        BackendLogger.log("BeforeSearch");
         dictionary.findValidSuggestions(getStringsFromMarkedSymbols(), true);
         setSuggestions(dictionary.getSuggestions(nSuggestions));
-        BackendLogger.log("TestAfterSearch");
         reset();
-
-
     }
 
     private void handleLetterSelected() {
@@ -471,7 +486,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
         keyboard.deleteLastCharacter();
     }
 
-    private void handleModeToggle() {
+    public void handleModeToggle() {
         if (mode == Mode.TILE_SELECTION_MODE) {
             mode = Mode.LETTER_SELECTION_MODE;
         } else if (mode == Mode.LETTER_SELECTION_MODE) {
@@ -552,7 +567,9 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
         for (Symbol sym : markedSymbols) {
             result += sym.getContent() + " ";
         }
-        BackendLogger.log("Marked symbols: " + result);
+
+        BackendLogger.log("Marked symbols - " + result + ", Number of marked - " + markedSymbols.size());
+
     }
 
     public void softReset() {
@@ -622,10 +639,6 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
         dictionary.nextWord();
     }
 
-    private void setCurrentSuggestions() {
-        setSuggestions(dictionary.getSuggestions(nSuggestions));
-    }
-
     private void writeSymbol() {
         String keyboardInput = keyboard.getCurrentBuffer().trim();
         keyboard.clearCurrentBuffer();
@@ -634,10 +647,6 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
         if (!markedSymbols.get(0).getContent().equals(" ")) {
             keyboard.addToCurrentBuffer(" ");
         }
-    }
-
-    private void setDefaultSuggestions() {
-        setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
     }
 
     /**
@@ -765,17 +774,26 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
     }
 
     private void logLocation() {
-        //Log.d("MobLayout", "Position: " + location[0] + ", " + location[1] + ", " + location[2]);
+        BackendLogger.log("Position: " + location[0] + ", " + location[1] + ", " + location[2]);
         String markedSymbolsText = "";
         for (Symbol s : markedSymbols) {
             markedSymbolsText += s.getContent() + " ";
         }
-        //Log.d("MobLayout", markedSymbolsText);
+        BackendLogger.log(markedSymbolsText);
     }
 
 
     public void setSuggestions(List<String> suggestions) {
-        this.suggestions = suggestions;
+        this.suggestions = new ArrayList<>();
+        this.suggestions.addAll(suggestions);
+    }
+
+    private void setCurrentSuggestions() {
+        setSuggestions(dictionary.getSuggestions(nSuggestions));
+    }
+
+    public void setDefaultSuggestions() {
+        setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
     }
 
     public int getMarkedWord() {
@@ -784,7 +802,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
 
 
     public List<String> getSuggestions() {
-        return suggestions;
+        return new ArrayList<>(suggestions);
     }
 
     public State getState() {

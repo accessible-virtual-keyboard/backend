@@ -130,6 +130,27 @@ public class MobileLayoutTest extends MobileLayoutTestBase {
     }
 
     @Test
+    public void modeChangedChooseWordWithDictionary() {
+        selectToggleMode();
+        selectETA_ETI_();
+        chooseItemAt(1);
+        selectETA_ETI_();
+        chooseItemAt(0);
+        selectSRH_OSD();
+        chooseItemAt(1);
+        assertExpectedHistorySize(3);
+        selectDictionary();
+        chooseItemAt(0);
+        assertOutputBufferEquals("Test ");
+    }
+
+    @Test
+    public void defaultNumberOfSuggestions(){
+        selectDictionary();
+        assertExpectedNumberOfSuggestions(20);
+    }
+
+    @Test
     public void modeChangedEndWordWithSpace() {
         selectToggleMode();
         selectETA_ETI_();
@@ -226,6 +247,10 @@ public class MobileLayoutTest extends MobileLayoutTestBase {
      * Writes "Test "
      */
     private void writeTestWord() {
+        selectToggleMode();
+        selectToggleMode();
+        //TODO figure out why tests break when run without toggling mode twice
+
         selectETA_ETI_();
         assertExpectedHistorySize(1);
         selectETA_ETI_();
