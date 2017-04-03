@@ -102,7 +102,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
 
                         Symbol.M, Symbol.F, Symbol.P, Symbol.G,
                         Symbol.K, Symbol.X, Symbol.J, Symbol.Q, Symbol.Z,
-                        Symbol.MODE_TOGGLE,
+                        Symbol.MODE_TOGGLE, Symbol.SETTING,
 
                         Symbol.DICTIONARY,
                         Symbol.PERIOD, Symbol.COMMA, Symbol.QUESTION_MARK, Symbol.EXCLAMATION_MARK,
@@ -111,8 +111,8 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                 stepIndices = new int[]{
                         0, 3, 6, 9,
                         12, 16, 20,
-                        24, 29, 30,
-                        31, 35, 36};
+                        24, 29, 31,
+                        32, 36, 37};
                 break;
             case LETTER_SELECTION_MODE:
                 symbols = new Symbol[]{
@@ -126,7 +126,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
 
                         Symbol.H, Symbol.U, Symbol.G, Symbol.V,
                         Symbol.F, Symbol.Y, Symbol.X, Symbol.Q, Symbol.Z,
-                        Symbol.MODE_TOGGLE,
+                        Symbol.MODE_TOGGLE, Symbol.SETTING,
 
                         Symbol.DICTIONARY,
                         Symbol.PERIOD, Symbol.COMMA, Symbol.QUESTION_MARK, Symbol.EXCLAMATION_MARK,
@@ -135,8 +135,8 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                 stepIndices = new int[]{
                         0, 4, 7, 10,
                         13, 17, 21,
-                        25, 30, 31,
-                        32, 36, 37};
+                        25, 30, 32,
+                        33, 37, 38};
                 break;
         }
 
@@ -258,7 +258,7 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                 } else if (markedSymbols.contains(Symbol.PERIOD)) {
                     changeStateLetterSelection();
                 } else if (markedSymbols.contains(Symbol.MODE_TOGGLE)) {
-                    handleModeToggle();
+                    changeStateLetterSelection();
                 } else if (mode == Mode.TILE_SELECTION_MODE) {
                     letterTilePressed();
                 } else if (mode == Mode.LETTER_SELECTION_MODE) {
@@ -292,7 +292,12 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
                     setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
                     state = State.SELECT_ROW;
                     reset();
-                } else if (mode == Mode.LETTER_SELECTION_MODE) {
+                } else if (markedSymbols.contains(Symbol.MODE_TOGGLE)){
+                    handleModeToggle();
+                } else if (markedSymbols.contains(Symbol.SETTING)){
+                    handleSettingsSelected();
+                }
+                else if (mode == Mode.LETTER_SELECTION_MODE) {
                     handleLetterSelected();
                 }
                 break;
@@ -480,6 +485,14 @@ public class MobileLayout extends BaseLayout implements LayoutWithSuggestions {
         updateLayoutStructure();
         changeStateRowSelection();
     }
+
+    private void handleSettingsSelected() {
+        dictionary.clearWordHistory();
+        setDefaultSuggestions();
+        changeStateRowSelection();
+        keyboard.requestChangeSettings();
+    }
+
 
 
     private void handleWordSeparatingSymbols() {
