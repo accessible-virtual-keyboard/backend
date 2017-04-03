@@ -2,7 +2,6 @@ package no.ntnu.stud.avikeyb.backend.layouts;
 
 import static no.ntnu.stud.avikeyb.backend.Symbol.*;
 
-import com.sun.media.jfxmedia.logging.Logger;
 import no.ntnu.stud.avikeyb.backend.InputType;
 import no.ntnu.stud.avikeyb.backend.Keyboard;
 import no.ntnu.stud.avikeyb.backend.Symbol;
@@ -231,7 +230,11 @@ public class AdaptiveLayout extends BaseLayout implements LayoutWithSuggestions 
             keyboard.deleteLastWord();
             reset();
             //TODO consider remaining in position instead of returning to start
-        }else {
+        } else if(current == Symbol.SETTING){
+            keyboard.requestChangeSettings();
+            reset();
+        }
+        else {
             keyboard.addToCurrentBuffer(current.getContent());
             reset();
         }
@@ -317,33 +320,33 @@ public class AdaptiveLayout extends BaseLayout implements LayoutWithSuggestions 
 
         HashMap<String, Symbol[]> map = new HashMap<>();
 
-        map.put(" ", new Symbol[]{T, A, I, C, F, L, O, S, B, M, N, Y, W, P, D, G, J, X, H, R, U, K, Z, QUESTION_MARK, E, V, Q, SPACE, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("a", new Symbol[]{N, R, L, SPACE, P, K, T, S, I, G, V, X, C, M, B, W, Z, J, D, Y, F, A, O, QUESTION_MARK, U, H, E, Q, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("b", new Symbol[]{E, A, O, I, Y, N, L, R, SPACE, T, D, H, U, S, J, M, F, X, B, C, P, G, Q, QUESTION_MARK, V, W, K, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("c", new Symbol[]{O, H, A, I, SPACE, M, E, K, R, C, P, F, T, U, Y, N, W, X, L, S, D, B, J, QUESTION_MARK, Q, G, V, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("d", new Symbol[]{SPACE, E, A, R, L, V, I, O, U, G, F, H, S, Y, N, J, P, Q, D, M, C, B, X, QUESTION_MARK, W, T, K, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("e", new Symbol[]{SPACE, R, D, L, M, F, S, N, T, P, G, B, A, C, V, W, H, U, E, X, I, Q, Z, QUESTION_MARK, Y, O, K, J, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("f", new Symbol[]{I, E, A, U, Y, N, O, R, L, S, H, G, F, SPACE, C, D, V, J, T, W, M, K, Q, QUESTION_MARK, B, P, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("g", new Symbol[]{SPACE, E, R, O, G, F, H, I, U, N, D, P, A, S, Y, W, V, J, L, T, B, K, Q, QUESTION_MARK, M, C, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("h", new Symbol[]{E, A, SPACE, U, N, W, O, I, R, L, F, P, T, Y, S, D, G, X, H, M, C, V, J, QUESTION_MARK, B, Q, K, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("i", new Symbol[]{N, S, C, L, G, SPACE, T, O, A, V, B, Q, E, D, M, Z, U, H, R, P, K, I, W, QUESTION_MARK, F, X, J, Y, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("j", new Symbol[]{E, A, U, T, H, F, O, I, R, L, P, B, SPACE, N, D, G, V, J, S, C, W, K, Q, QUESTION_MARK, M, Y, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("k", new Symbol[]{E, SPACE, S, N, U, P, I, Y, L, T, G, C, A, O, F, W, B, J, R, D, H, V, Q, QUESTION_MARK, M, K, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("l", new Symbol[]{E, I, L, Y, T, C, SPACE, A, S, F, P, W, O, U, V, B, G, J, D, K, R, H, Q, QUESTION_MARK, M, N, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("m", new Symbol[]{A, E, O, M, Y, T, I, SPACE, B, N, L, G, P, U, C, K, W, J, S, F, H, V, Q, QUESTION_MARK, R, D, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("n", new Symbol[]{G, SPACE, E, I, N, F, T, D, A, K, L, M, S, C, Y, B, Z, Q, O, V, J, R, W, QUESTION_MARK, U, H, P, X, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("o", new Symbol[]{N, R, L, T, P, K, U, M, S, C, A, Y, O, W, D, I, E, Z, SPACE, V, G, H, J, QUESTION_MARK, B, F, X, Q, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("p", new Symbol[]{E, R, O, SPACE, S, K, A, I, P, T, C, G, L, U, Y, F, W, J, H, M, N, V, Q, QUESTION_MARK, D, B, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("q", new Symbol[]{U, SPACE, T, I, H, F, E, A, N, L, P, B, O, S, D, G, V, J, R, C, W, K, Q, QUESTION_MARK, M, Y, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("r", new Symbol[]{E, SPACE, I, T, U, C, A, O, R, N, K, F, S, Y, M, V, W, X, D, G, B, H, Q, QUESTION_MARK, L, P, J, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("s", new Symbol[]{SPACE, T, I, O, C, K, E, S, U, L, N, G, H, A, Y, F, B, J, P, M, D, R, X, QUESTION_MARK, W, Q, V, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("t", new Symbol[]{SPACE, E, A, O, Y, N, I, H, S, L, F, G, R, T, C, B, V, X, U, M, Z, P, J, QUESTION_MARK, W, D, K, Q, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("u", new Symbol[]{R, N, L, C, A, SPACE, S, T, E, D, H, V, M, G, P, Y, K, J, I, B, Z, X, Q, QUESTION_MARK, F, O, U, W, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("v", new Symbol[]{E, I, O, U, L, C, A, SPACE, V, T, M, W, Y, S, N, F, B, J, R, H, P, K, Q, QUESTION_MARK, D, G, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("w", new Symbol[]{A, E, SPACE, N, D, K, I, H, S, W, T, P, O, R, B, M, G, J, L, F, U, V, Q, QUESTION_MARK, Y, C, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("x", new Symbol[]{P, I, T, C, S, R, SPACE, E, U, H, L, G, A, Y, W, D, B, X, O, Q, M, V, J, QUESTION_MARK, N, F, K, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("y", new Symbol[]{SPACE, S, I, L, N, B, E, A, C, T, U, K, O, M, P, G, Z, X, D, R, F, V, J, QUESTION_MARK, W, H, Y, Q, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
-        map.put("z", new Symbol[]{E, A, I, Y, G, H, SPACE, O, S, V, D, P, Z, L, T, C, W, X, U, N, M, B, J, QUESTION_MARK, R, F, K, Q, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SPECIAL_CHARACTERS, SEND});
+        map.put(" ", new Symbol[]{T, A, I, C, F, L, O, S, B, M, N, Y, W, P, D, G, J, X, H, R, U, K, Z, QUESTION_MARK, E, V, Q, SPACE, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("a", new Symbol[]{N, R, L, SPACE, P, K, T, S, I, G, V, X, C, M, B, W, Z, J, D, Y, F, A, O, QUESTION_MARK, U, H, E, Q, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("b", new Symbol[]{E, A, O, I, Y, N, L, R, SPACE, T, D, H, U, S, J, M, F, X, B, C, P, G, Q, QUESTION_MARK, V, W, K, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("c", new Symbol[]{O, H, A, I, SPACE, M, E, K, R, C, P, F, T, U, Y, N, W, X, L, S, D, B, J, QUESTION_MARK, Q, G, V, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("d", new Symbol[]{SPACE, E, A, R, L, V, I, O, U, G, F, H, S, Y, N, J, P, Q, D, M, C, B, X, QUESTION_MARK, W, T, K, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("e", new Symbol[]{SPACE, R, D, L, M, F, S, N, T, P, G, B, A, C, V, W, H, U, E, X, I, Q, Z, QUESTION_MARK, Y, O, K, J, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("f", new Symbol[]{I, E, A, U, Y, N, O, R, L, S, H, G, F, SPACE, C, D, V, J, T, W, M, K, Q, QUESTION_MARK, B, P, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("g", new Symbol[]{SPACE, E, R, O, G, F, H, I, U, N, D, P, A, S, Y, W, V, J, L, T, B, K, Q, QUESTION_MARK, M, C, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("h", new Symbol[]{E, A, SPACE, U, N, W, O, I, R, L, F, P, T, Y, S, D, G, X, H, M, C, V, J, QUESTION_MARK, B, Q, K, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("i", new Symbol[]{N, S, C, L, G, SPACE, T, O, A, V, B, Q, E, D, M, Z, U, H, R, P, K, I, W, QUESTION_MARK, F, X, J, Y, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("j", new Symbol[]{E, A, U, T, H, F, O, I, R, L, P, B, SPACE, N, D, G, V, J, S, C, W, K, Q, QUESTION_MARK, M, Y, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("k", new Symbol[]{E, SPACE, S, N, U, P, I, Y, L, T, G, C, A, O, F, W, B, J, R, D, H, V, Q, QUESTION_MARK, M, K, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("l", new Symbol[]{E, I, L, Y, T, C, SPACE, A, S, F, P, W, O, U, V, B, G, J, D, K, R, H, Q, QUESTION_MARK, M, N, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("m", new Symbol[]{A, E, O, M, Y, T, I, SPACE, B, N, L, G, P, U, C, K, W, J, S, F, H, V, Q, QUESTION_MARK, R, D, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("n", new Symbol[]{G, SPACE, E, I, N, F, T, D, A, K, L, M, S, C, Y, B, Z, Q, O, V, J, R, W, QUESTION_MARK, U, H, P, X, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("o", new Symbol[]{N, R, L, T, P, K, U, M, S, C, A, Y, O, W, D, I, E, Z, SPACE, V, G, H, J, QUESTION_MARK, B, F, X, Q, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("p", new Symbol[]{E, R, O, SPACE, S, K, A, I, P, T, C, G, L, U, Y, F, W, J, H, M, N, V, Q, QUESTION_MARK, D, B, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("q", new Symbol[]{U, SPACE, T, I, H, F, E, A, N, L, P, B, O, S, D, G, V, J, R, C, W, K, Q, QUESTION_MARK, M, Y, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("r", new Symbol[]{E, SPACE, I, T, U, C, A, O, R, N, K, F, S, Y, M, V, W, X, D, G, B, H, Q, QUESTION_MARK, L, P, J, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("s", new Symbol[]{SPACE, T, I, O, C, K, E, S, U, L, N, G, H, A, Y, F, B, J, P, M, D, R, X, QUESTION_MARK, W, Q, V, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("t", new Symbol[]{SPACE, E, A, O, Y, N, I, H, S, L, F, G, R, T, C, B, V, X, U, M, Z, P, J, QUESTION_MARK, W, D, K, Q, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("u", new Symbol[]{R, N, L, C, A, SPACE, S, T, E, D, H, V, M, G, P, Y, K, J, I, B, Z, X, Q, QUESTION_MARK, F, O, U, W, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("v", new Symbol[]{E, I, O, U, L, C, A, SPACE, V, T, M, W, Y, S, N, F, B, J, R, H, P, K, Q, QUESTION_MARK, D, G, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("w", new Symbol[]{A, E, SPACE, N, D, K, I, H, S, W, T, P, O, R, B, M, G, J, L, F, U, V, Q, QUESTION_MARK, Y, C, X, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("x", new Symbol[]{P, I, T, C, S, R, SPACE, E, U, H, L, G, A, Y, W, D, B, X, O, Q, M, V, J, QUESTION_MARK, N, F, K, Z, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("y", new Symbol[]{SPACE, S, I, L, N, B, E, A, C, T, U, K, O, M, P, G, Z, X, D, R, F, V, J, QUESTION_MARK, W, H, Y, Q, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
+        map.put("z", new Symbol[]{E, A, I, Y, G, H, SPACE, O, S, V, D, P, Z, L, T, C, W, X, U, N, M, B, J, QUESTION_MARK, R, F, K, Q, COMMA, EXCLAMATION_MARK, DICTIONARY, CORRECT_WORD, DELETE_WORD, PERIOD, SETTING, SEND});
         return map;
     }
 

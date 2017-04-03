@@ -55,7 +55,7 @@ public class BinarySearchTreeDefinition {
 
         //@formatter:off
         return
-        d(s(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, SPACE, SEND, NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9, COMMA, PERIOD, EXCLAMATION_MARK, QUESTION_MARK, BACKSPACE, DELETE_WORD, CLEAR_BUFFER), suggestions,
+        d(s(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, SPACE, SEND, NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9, COMMA, PERIOD, EXCLAMATION_MARK, QUESTION_MARK, BACKSPACE, DELETE_WORD, CLEAR_BUFFER, SETTING), suggestions,
             n(s(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, SPACE, SEND),
                 n(s(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P),
                     n(s(A, B, E, F, I, J, M, N),
@@ -83,9 +83,9 @@ public class BinarySearchTreeDefinition {
                             l(S, T),
                             l(W, X)),
                         l(SPACE, SEND)))),
-            d(s(NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9, PERIOD, COMMA, QUESTION_MARK, EXCLAMATION_MARK, BACKSPACE, DELETE_WORD, CLEAR_BUFFER), suggestions,
-                n(s(NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9, PERIOD, COMMA, QUESTION_MARK, EXCLAMATION_MARK, BACKSPACE, DELETE_WORD, CLEAR_BUFFER),
-                    n(s(NUM_0, NUM_1, NUM_4, NUM_5, NUM_8, NUM_9, PERIOD, COMMA, NUM_2, NUM_3, NUM_6, NUM_7, QUESTION_MARK, EXCLAMATION_MARK, CLEAR_BUFFER),
+            d(s(NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9, PERIOD, COMMA, QUESTION_MARK, EXCLAMATION_MARK, BACKSPACE, DELETE_WORD, CLEAR_BUFFER, SETTING), suggestions,
+                n(s(NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9, PERIOD, COMMA, QUESTION_MARK, EXCLAMATION_MARK, BACKSPACE, DELETE_WORD, CLEAR_BUFFER, SETTING),
+                    n(s(NUM_0, NUM_1, NUM_4, NUM_5, NUM_8, NUM_9, PERIOD, COMMA, NUM_2, NUM_3, NUM_6, NUM_7, QUESTION_MARK, EXCLAMATION_MARK, CLEAR_BUFFER, SETTING),
                         n(s(NUM_0, NUM_1, NUM_4, NUM_5, NUM_8, NUM_9, QUESTION_MARK, EXCLAMATION_MARK),
                             n(s(NUM_0, NUM_1, NUM_4, NUM_5),
                                 l(NUM_0, NUM_1),
@@ -93,13 +93,13 @@ public class BinarySearchTreeDefinition {
                             n(s(NUM_8, NUM_9, QUESTION_MARK, EXCLAMATION_MARK),
                                 l(NUM_8, NUM_9),
                                 l(QUESTION_MARK, EXCLAMATION_MARK))),
-                        n(s(NUM_2, NUM_3, NUM_6, NUM_7, PERIOD, COMMA, CLEAR_BUFFER),
+                        n(s(NUM_2, NUM_3, NUM_6, NUM_7, PERIOD, COMMA, CLEAR_BUFFER, SETTING),
                             n(s(NUM_2, NUM_3, NUM_6, NUM_7),
                                 l(NUM_2, NUM_3),
                                 l(NUM_6, NUM_7)),
-                            n(s(PERIOD, COMMA, CLEAR_BUFFER),
+                            n(s(PERIOD, COMMA, CLEAR_BUFFER, SETTING),
                                 l(PERIOD, COMMA),
-                                leaf(CLEAR_BUFFER)))),
+                                l(SETTING, CLEAR_BUFFER)))),
                     l(BACKSPACE, DELETE_WORD)),
                 suggestionNode(suggestions)));
         //@formatter:on

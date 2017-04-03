@@ -14,6 +14,7 @@ public class CoreKeyboard implements Keyboard {
     // List of output devices
     private ArrayList<OutputDevice> outputDevices;
     private ArrayList<KeyboardListener> listeners;
+    private ArrayList<SettingsListener> settingsListeners;
 
     // The current output buffer
     private StringBuilder currentBuffer;
@@ -22,6 +23,7 @@ public class CoreKeyboard implements Keyboard {
         currentBuffer = new StringBuilder();
         outputDevices = new ArrayList<>();
         listeners = new ArrayList<>();
+        settingsListeners = new ArrayList<>();
     }
 
 
@@ -45,6 +47,24 @@ public class CoreKeyboard implements Keyboard {
     public void removeStateListener(KeyboardListener listener) {
         listeners.remove(listener);
     }
+
+    @Override
+    public void requestChangeSettings() {
+        for(SettingsListener listener : settingsListeners){
+            listener.onSettingsRequestd();
+        }
+    }
+
+    @Override
+    public void addSettingsListener(SettingsListener listener) {
+        settingsListeners.add(listener);
+    }
+
+    @Override
+    public void removeSettingsListener(SettingsListener listener) {
+        settingsListeners.remove(listener);
+    }
+
 
 
     @Override

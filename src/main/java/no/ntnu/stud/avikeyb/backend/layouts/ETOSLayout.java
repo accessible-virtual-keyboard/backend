@@ -28,7 +28,7 @@ public class ETOSLayout extends BaseLayout implements LayoutWithSuggestions {
             Symbol.I, Symbol.R, Symbol.C, Symbol.G, Symbol.V, Symbol.J,
             Symbol.H, Symbol.U, Symbol.W, Symbol.K, Symbol.Q, Symbol.QUESTION_MARK,
             Symbol.M, Symbol.Y, Symbol.X, Symbol.Z, Symbol.COMMA, Symbol.EXCLAMATION_MARK,
-            Symbol.DICTIONARY, Symbol.CORRECT_WORD, Symbol.DELETE_WORD, Symbol.PERIOD, Symbol.SPECIAL_CHARACTERS, Symbol.SEND
+            Symbol.DICTIONARY, Symbol.CORRECT_WORD, Symbol.DELETE_WORD, Symbol.PERIOD, Symbol.SETTING, Symbol.SEND
     };
 
     private static Symbol[] menu = Symbols.menuOptions();
@@ -235,7 +235,11 @@ public class ETOSLayout extends BaseLayout implements LayoutWithSuggestions {
                             keyboard.deleteLastWord();
                             reset();
                             //TODO consider remaining in position instead of returning to start
-                        } else{
+                        } else if(getCurrentSymbol().equals(Symbol.SETTING)){
+                            keyboard.requestChangeSettings();
+                            reset();
+                        }
+                        else{
                             selectCurrentSymbol();
                             reset();
                         }

@@ -18,7 +18,7 @@ public class BinarySearchLayout extends BaseLayout implements LayoutWithSuggesti
     // Only used for letting the ui know all the symbols in the layout
     private static Symbol[] symbols = Symbols.merge(
             Symbols.alphabet(),
-            Symbols.build(Symbol.SPACE, Symbol.SEND, Symbol.BACKSPACE, Symbol.DELETE_WORD, Symbol.CLEAR_BUFFER),
+            Symbols.build(Symbol.SPACE, Symbol.SEND, Symbol.BACKSPACE, Symbol.DELETE_WORD, Symbol.CLEAR_BUFFER, Symbol.SETTING),
             Symbols.numbers(),
             Symbols.commonPunctuations());
 
@@ -186,6 +186,9 @@ public class BinarySearchLayout extends BaseLayout implements LayoutWithSuggesti
         }
         else if(symbol == Symbol.CLEAR_BUFFER){
             keyboard.clearCurrentBuffer();
+        }
+        else if(symbol == Symbol.SETTING){
+            keyboard.requestChangeSettings();
         }
         else {
             keyboard.addToCurrentBuffer(symbol.getContent());

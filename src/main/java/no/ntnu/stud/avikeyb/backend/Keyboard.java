@@ -23,6 +23,17 @@ public interface Keyboard {
 
 
     /**
+     * Listen for request for keybaord settings
+     */
+    interface SettingsListener {
+        /**
+         * Called when the user want to change settings
+         */
+        void onSettingsRequestd();
+    }
+
+
+    /**
      * Adds the string value to the current keyboard output buffer
      *
      * @param value
@@ -94,5 +105,24 @@ public interface Keyboard {
      */
     void removeStateListener(KeyboardListener listener);
 
+
+    /**
+     * Should be called to let the user change any settings the keyboard may have
+     */
+    void requestChangeSettings();
+
+    /**
+     * Register an listener when the user requests to change settings
+     *
+     * @param listener the settings listener to register
+     */
+    void addSettingsListener(SettingsListener listener);
+
+    /**
+     * Removes a registered listener from the keyboard
+     *
+     * @param listener the settings listener to unregister
+     */
+    void removeSettingsListener(SettingsListener listener);
 
 }
