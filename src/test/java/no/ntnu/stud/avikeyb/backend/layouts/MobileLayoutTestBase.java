@@ -19,7 +19,8 @@ public class MobileLayoutTestBase extends LayoutTestBase {
     @Override
     protected Layout createLayout() {
         List<DictionaryEntry> entries = new DictionaryFileLoader(getClass().getClassLoader().getResource("dictionary.txt").getPath()).loadDictionary();
-        layout = new MobileLayout(keyboard, new LinearEliminationDictionaryHandler(), entries);
+        layout = new MobileLayout(keyboard, new LinearEliminationDictionaryHandler());
+        layout.setDictionaryList(entries);
         return layout;
     }
     

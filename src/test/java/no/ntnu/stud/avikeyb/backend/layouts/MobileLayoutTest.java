@@ -247,6 +247,10 @@ public class MobileLayoutTest extends MobileLayoutTestBase {
      * Writes "Test "
      */
     private void writeTestWord() {
+        selectToggleMode();
+        selectToggleMode();
+        //TODO figure out why tests break when run without toggling mode twice
+
         selectETA_ETI_();
         assertExpectedHistorySize(1);
         selectETA_ETI_();

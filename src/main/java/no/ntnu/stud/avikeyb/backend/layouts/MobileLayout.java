@@ -19,7 +19,7 @@ import java.util.List;
  * Created by Tor-Martin Holen on 21-Feb-17.
  */
 
-public class MobileLayout extends BaseLayout{
+public class MobileLayout extends BaseLayout {
 
     private int[] stepIndices;
     private Symbol[] symbols;
@@ -53,6 +53,7 @@ public class MobileLayout extends BaseLayout{
 
     /**
      * Constructor for Front-End applications that want to connect to the Back-End.
+     *
      * @param keyboard
      * @param dictionary
      */
@@ -63,6 +64,14 @@ public class MobileLayout extends BaseLayout{
         updateLayoutStructure();
         setDefaultSuggestions();
         onStep(InputType.INPUT1);
+/*        dictionary.setDictionaryChangedListener(new LinearEliminationDictionaryHandler.DictionaryChangedListener() {
+            @Override
+            public void dictionaryChanged() {
+                setDefaultSuggestions();
+                notifyLayoutListeners();
+                BackendLogger.log("DictionaryChanged Interface is called");
+            }
+        });*/
     }
 
     /**
@@ -76,7 +85,6 @@ public class MobileLayout extends BaseLayout{
         suggestions = new ArrayList<>();
         this.keyboard = keyboard;
         dictionary.setDictionary(entries);
-        //dictionary.startCaching();
 
         this.dictionary = dictionary;
         updateLayoutStructure();
@@ -205,6 +213,7 @@ public class MobileLayout extends BaseLayout{
     /**
      * Obtains the content the current row's tiles.
      * Note this method will contain strings of symbols that aren't single letters, so these must be handled properly.
+     *
      * @return A list containing a list of strings (tile).
      */
     private List<List<String>> getRowTiles() {
@@ -228,16 +237,14 @@ public class MobileLayout extends BaseLayout{
 
     /**
      * Handles the input logic for rows.
+     *
      * @param input
      */
     private void onStepRowMode(InputType input) {
         switch (input) {
             case INPUT1: //Move
                 nextRow();
-                /*TODO for some odd reason the suggestions is empty after nextRow() in LETTER_SELECTION_MODE,
-                so the cause of why it is empty should be found and then the if statement below should be removable, note the tests are successful, but the mobile app
-                */
-                if(mode == Mode.LETTER_SELECTION_MODE && suggestions.size() == 0){
+                if (mode == Mode.LETTER_SELECTION_MODE && suggestions.size() == 0) {
                     setCurrentSuggestions();
                 }
                 break;
@@ -250,6 +257,7 @@ public class MobileLayout extends BaseLayout{
 
     /**
      * Handles the input logic for columns.
+     *
      * @param input
      */
     private void onStepColumnMode(InputType input) {
@@ -280,6 +288,7 @@ public class MobileLayout extends BaseLayout{
 
     /**
      * Handles the input logic for letter selection.
+     *
      * @param input
      */
     private void onStepLetterMode(InputType input) {
@@ -310,6 +319,7 @@ public class MobileLayout extends BaseLayout{
 
     /**
      * Handles input logic for dictionary selection
+     *
      * @param input
      */
     private void onStepDictionaryMode(InputType input) {
@@ -471,7 +481,7 @@ public class MobileLayout extends BaseLayout{
         keyboard.deleteLastCharacter();
     }
 
-    private void handleModeToggle() {
+    public void handleModeToggle() {
         if (mode == Mode.TILE_SELECTION_MODE) {
             mode = Mode.LETTER_SELECTION_MODE;
         } else if (mode == Mode.LETTER_SELECTION_MODE) {
@@ -769,7 +779,7 @@ public class MobileLayout extends BaseLayout{
         setSuggestions(dictionary.getSuggestions(nSuggestions));
     }
 
-    private void setDefaultSuggestions() {
+    public void setDefaultSuggestions() {
         setSuggestions(dictionary.getDefaultSuggestion(nSuggestions));
     }
 

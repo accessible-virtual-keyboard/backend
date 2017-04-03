@@ -12,11 +12,21 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
     private List<DictionaryEntry> fullDictionary;
     private List<DictionaryEntry> fullDictionaryFrequencySorted;
 
+
+    public interface DictionaryChangedListener {
+        void dictionaryChanged();
+    }
+
+    private DictionaryChangedListener dictionaryChangedListener = null;
+
+    public void setDictionaryChangedListener(DictionaryChangedListener dictionaryChangedListener) {
+        this.dictionaryChangedListener = dictionaryChangedListener;
+    }
+
     /**
      * Should store all the word histories until the phrase is sent.
      */
     private List<List<SearchEntry>> phraseHistory;
-
     /**
      * List of suggestions given at different word lengths.
      */
@@ -32,6 +42,7 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
      */
     public LinearEliminationDictionaryHandler() {
         phraseHistory = new ArrayList<>();
+        setDictionary(new ArrayList<DictionaryEntry>());
     }
 
     @Override
@@ -41,6 +52,9 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
         fullDictionaryFrequencySorted.addAll(dictionary);
         ListSorter.sortList(fullDictionaryFrequencySorted, SortingOrder.FREQUENCY_HIGH_TO_LOW);
         isWordHistoryInitialized();
+        if (dictionaryChangedListener != null) {
+            dictionaryChangedListener.dictionaryChanged();
+        }
     }
 
     /**
@@ -497,12 +511,15 @@ public class LinearEliminationDictionaryHandler implements InMemoryDictionary {
      * @return
      */
     public List<String> getSuggestions(int n) {
-        List<DictionaryEntry> list = getSuggestionsWithFrequencies(n);
-        List<String> resultList = new ArrayList<>();
-        for (DictionaryEntry entry : list) {
-            resultList.add(entry.getWord());
+        synchronized (fullDictionary) {
+            List<DictionaryEntry> list = getSuggestionsWithFrequencies(n);
+            List<String> resultList = new ArrayList<>();
+            for (DictionaryEntry entry : list) {
+                resultList.add(entry.getWord());
+            }
+            fullDictionary.notify();
+            return resultList;
         }
-        return resultList;
     }
 
     @Override
