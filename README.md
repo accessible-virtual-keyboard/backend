@@ -35,7 +35,7 @@ After installing the project, you can include it in your project by adding the f
 
 ## Documentation
 
-A brief introduction about how to use the project can be found in the [wiki](wiki) 
+A brief introduction about how to use the project can be found in the [wiki](https://github.com/accessible-virtual-keyboard/backend/wiki) 
 
 
 
